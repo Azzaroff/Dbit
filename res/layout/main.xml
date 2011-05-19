@@ -10,13 +10,21 @@
     android:text="@string/hello"
     />
 <EditText  
+	android:id="@+id/edit"
     android:layout_width="fill_parent" 
     android:layout_height="wrap_content" 
-    android:text="hello edit"
+    android:text="select * from phonebook"
     />
 <Button
+	android:id="@+id/los"
 	android:layout_width="fill_parent" 
     android:layout_height="wrap_content" 
     android:text="los!"
+    android:onClick="startQuery"
+	/>
+<TextView
+	android:id="@+id/output"
+	android:layout_width="fill_parent" 
+    android:layout_height="wrap_content"
 	/>
 </LinearLayout>
