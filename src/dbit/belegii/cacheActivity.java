@@ -16,8 +16,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class cacheActivity extends Activity {
-    /** Called when the activity is first created. */
-    @Override
+    private Buffer buffer = new FiFo(3);
+	
+	/** Called when the activity is first created. */
+	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
@@ -33,6 +35,8 @@ public class cacheActivity extends Activity {
     	Toast.makeText(cacheActivity.this, query.getText(), Toast.LENGTH_SHORT).show();
     
     	output.setText("");
+    	
+    	String result = "";
     	
     	try {
     		Log.i("postgres","Go Postgres!");
@@ -55,6 +59,8 @@ public class cacheActivity extends Activity {
 			    row = row + " |";
 			    Log.i("postgres",row);
 			    output.append(row + "\n");
+			    result += row;
+			    result += "\n";
 			}
 			rs.close();
 			st.close();
@@ -62,8 +68,10 @@ public class cacheActivity extends Activity {
 			e.printStackTrace();
 		} catch (SQLException e) {
 			e.printStackTrace();
-			
 			Toast.makeText(cacheActivity.this, "no Connection to Postgres", Toast.LENGTH_SHORT).show();
 		}
+		
+		Query buffelem = new Query(query.getText().toString(), result);
+		buffer.add(buffelem);
     }
 }
