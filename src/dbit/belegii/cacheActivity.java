@@ -16,7 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class cacheActivity extends Activity {
-    private Buffer buffer = new FiFo(3);
+    private Buffer buffer = new LRU(3);
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -43,35 +43,39 @@ public class cacheActivity extends Activity {
 			Class.forName("org.postgresql.Driver");
 			String url = "jdbc:postgresql://anna05.medien.uni-weimar.de/felix?user=felix&password=felix1621";
 			Connection conn = DriverManager.getConnection(url);
-			
-			Statement st = conn.createStatement();
-			ResultSet rs = st.executeQuery(query.getText().toString());
-			ResultSetMetaData rsmd = rs.getMetaData();
-
-		    int numCols = rsmd.getColumnCount();
-			
-			while (rs.next()) {
-				Log.i("postgres","getting one column");
-				String row = "";
-			    for (int i = 1; i <= numCols; i++) {
-			    	 row = row + "| " + rs.getString(i);
+			//asking the buffer
+			Query q;
+			if((q = (buffer.get(query.getText().toString()))) != null){
+				output.append(q.result);
+			}else{//no matching item in buffer			
+				Statement st = conn.createStatement();
+				ResultSet rs = st.executeQuery(query.getText().toString());
+				ResultSetMetaData rsmd = rs.getMetaData();
+	
+			    int numCols = rsmd.getColumnCount();
+				
+				while (rs.next()) {
+					Log.i("postgres","getting one column");
+					String row = "";
+				    for (int i = 1; i <= numCols; i++) {
+				    	 row = row + "| " + rs.getString(i);
+					}
+				    row = row + " |";
+				    Log.i("postgres",row);
+				    output.append(row + "\n");
+				    result += row;
+				    result += "\n";
 				}
-			    row = row + " |";
-			    Log.i("postgres",row);
-			    output.append(row + "\n");
-			    result += row;
-			    result += "\n";
-			}
-			rs.close();
-			st.close();
+				rs.close();
+				st.close();
+				//add the query and its result to the buffer
+				Query buffelem = new Query(query.getText().toString(), result);
+				buffer.add(buffelem);
+			}			
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (SQLException e) {
 			e.printStackTrace();
-			Toast.makeText(cacheActivity.this, "no Connection to Postgres", Toast.LENGTH_SHORT).show();
 		}
-		
-		Query buffelem = new Query(query.getText().toString(), result);
-		buffer.add(buffelem);
     }
 }
