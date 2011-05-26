@@ -37,7 +37,7 @@ public class cacheActivity extends Activity {
     	try {
     		Log.i("postgres","Go Postgres!");
 			Class.forName("org.postgresql.Driver");
-			String url = "jdbc:postgresql://seclab10.medien.uni-weimar.de/felix?user=felix&password=felix1621";
+			String url = "jdbc:postgresql://anna05.medien.uni-weimar.de/felix?user=felix&password=felix1621";
 			Connection conn = DriverManager.getConnection(url);
 			
 			Statement st = conn.createStatement();
@@ -62,6 +62,8 @@ public class cacheActivity extends Activity {
 			e.printStackTrace();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			
+			Toast.makeText(cacheActivity.this, "no Connection to Postgres", Toast.LENGTH_SHORT).show();
 		}
     }
 }
