@@ -7,32 +7,36 @@ import android.util.Log;
 
 public class FiFo extends Buffer{
 
+	private Queue<Query> data = new LinkedList<Query>();
+	
 	public FiFo(int size) {
 		super(size);
 	}
-
-	private Queue<Query> data = new LinkedList<Query>();
 	
 	@Override
 	public void add(Query query) {
 		if(contains(query)){
-			Log.i(this.getClass().getSimpleName(), "FiFo: nothing to add, size: "+data.size());
+			Log.i(this.getClass().getSimpleName(), "nothing to add, size: "+data.size());
 			return;
 		}		
 		if(data.size() == size){
-			data.remove();
-			Log.i(this.getClass().getSimpleName(), "FiFo: remove");
+			data.poll();
+			Log.i(this.getClass().getSimpleName(), "poll");
 		}
 		
 		data.offer(query);
-		Log.i(this.getClass().getSimpleName(), "FiFo: add, new size: "+data.size());
+		Log.i(this.getClass().getSimpleName(), "add, new size: "+data.size());
 	}
 
 	@Override
 	public Query get(String query) {
 		for(Query result : data){
-			if(result.query.equals(query)) return result;
-		}		
+			if(result.query.equals(query)){
+				Log.i(this.getClass().getSimpleName(), "result found in cache");
+				return result;
+			}
+		}
+		Log.i(this.getClass().getSimpleName(), "no result found in cache");
 		return null;
 	}
 	
