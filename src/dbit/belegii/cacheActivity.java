@@ -93,7 +93,7 @@ public class cacheActivity extends Activity {
 				ResultSetMetaData rsmd = rs.getMetaData();
 	
 				//check, if the statement changes DB entries
-				if((statement.toLowerCase()).contains("insert")){ //if it changes something, the buffer will be cleared
+				if((statement.toLowerCase()).contains("insert") || statement.toLowerCase().contains("update")){ //if it changes something, the buffer will be cleared
 					//todo: intelligenteres Vorgehen! vlt. nur die betroffenen Zeilen aus dem Buffer löschen o.ä. 
 					buffer.clear();
 				}
