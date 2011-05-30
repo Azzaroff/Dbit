@@ -63,6 +63,7 @@ public class cacheActivity extends Activity {
         final TextView output = (TextView) findViewById(R.id.output);
         final TextView time_output = (TextView) findViewById(R.id.time_output_0);
         final TextView time_description = (TextView) findViewById(R.id.time_0);
+        final TextView time_output_recent = (TextView) findViewById(R.id.time_output_1);
     	
     	Toast.makeText(cacheActivity.this, query.getText(), Toast.LENGTH_SHORT).show();
     
@@ -83,6 +84,7 @@ public class cacheActivity extends Activity {
 				output.append(q.result);
 				time_description.setText("Zeit (cache): ");
 				time_output.setText(""+(SystemClock.elapsedRealtime() - elapsedtime)+" ms");
+				time_output_recent.setText(""+q.getDuration()+" ms");
 			}else{//no matching item in buffer			
 				elapsedtime = SystemClock.elapsedRealtime();
 				Statement st = conn.createStatement();
@@ -113,11 +115,12 @@ public class cacheActivity extends Activity {
 				rs.close();
 				st.close();
 				//output the elapsed time for asking postgres
-				time_output.setText(""+(SystemClock.elapsedRealtime() - elapsedtime)+" ms");
+				time_output.setText(""+(elapsedtime = (SystemClock.elapsedRealtime() - elapsedtime))+" ms");
 				time_description.setText("Zeit (WAN): ");
 				//add the query and its result to the buffer
-				Query buffelem = new Query(query.getText().toString(), result);
+				Query buffelem = new Query(query.getText().toString(), result, elapsedtime);
 				buffer.add(buffelem);
+				time_output_recent.setText("-");
 			}			
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
