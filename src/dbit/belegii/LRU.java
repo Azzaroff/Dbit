@@ -50,4 +50,9 @@ public class LRU extends Buffer{
 		return contains;
 	}
 
+	@Override
+	public void clear() {
+		data.clear();
+	}
+
 }

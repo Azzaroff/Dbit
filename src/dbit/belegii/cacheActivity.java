@@ -11,6 +11,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -60,12 +61,15 @@ public class cacheActivity extends Activity {
     public void startQuery(View view) {
     	final EditText query = (EditText)findViewById(R.id.edit);
         final TextView output = (TextView) findViewById(R.id.output);
+        final TextView time_output = (TextView) findViewById(R.id.time_output_0);
+        final TextView time_description = (TextView) findViewById(R.id.time_0);
     	
     	Toast.makeText(cacheActivity.this, query.getText(), Toast.LENGTH_SHORT).show();
     
     	output.setText("");
     	
     	String result = "";
+    	long elapsedtime;
     	
     	try {
     		Log.i("postgres","Go Postgres!");
@@ -74,13 +78,24 @@ public class cacheActivity extends Activity {
 			Connection conn = DriverManager.getConnection(url);
 			//asking the buffer
 			Query q;
+			elapsedtime = SystemClock.elapsedRealtime();
 			if((q = (buffer.get(query.getText().toString()))) != null){
 				output.append(q.result);
+				time_description.setText("Zeit (cache): ");
+				time_output.setText(""+(SystemClock.elapsedRealtime() - elapsedtime)+" ms");
 			}else{//no matching item in buffer			
+				elapsedtime = SystemClock.elapsedRealtime();
 				Statement st = conn.createStatement();
-				ResultSet rs = st.executeQuery(query.getText().toString());
+				String statement = query.getText().toString();
+				ResultSet rs = st.executeQuery(statement);
 				ResultSetMetaData rsmd = rs.getMetaData();
 	
+				//check, if the statement changes DB entries
+				if((statement.toLowerCase()).contains("insert")){ //if it changes something, the buffer will be cleared
+					//todo: intelligenteres Vorgehen! vlt. nur die betroffenen Zeilen aus dem Buffer löschen o.ä. 
+					buffer.clear();
+				}
+				
 			    int numCols = rsmd.getColumnCount();
 				
 				while (rs.next()) {
@@ -97,6 +112,9 @@ public class cacheActivity extends Activity {
 				}
 				rs.close();
 				st.close();
+				//output the elapsed time for asking postgres
+				time_output.setText(""+(SystemClock.elapsedRealtime() - elapsedtime)+" ms");
+				time_description.setText("Zeit (WAN): ");
 				//add the query and its result to the buffer
 				Query buffelem = new Query(query.getText().toString(), result);
 				buffer.add(buffelem);

@@ -48,4 +48,9 @@ public class FiFo extends Buffer{
 		return contains;
 	}
 
+	@Override
+	public void clear() {
+		data.clear();		
+	}
+
 }

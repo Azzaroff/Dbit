@@ -10,6 +10,7 @@ public abstract class Buffer {
 	
 	abstract public void add(Query query);
 	abstract public Query get(String query);
+	abstract public void clear();
 }
 
 
