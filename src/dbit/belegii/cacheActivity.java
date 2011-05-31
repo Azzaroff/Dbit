@@ -72,6 +72,7 @@ public class cacheActivity extends Activity {
     	String result = "";
     	long elapsedtime;
     	
+    	//blabla
     	//bla
     	
     	try {
