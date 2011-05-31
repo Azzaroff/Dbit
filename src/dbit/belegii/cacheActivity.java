@@ -72,7 +72,7 @@ public class cacheActivity extends Activity {
     	String result = "";
     	long elapsedtime;
     	
-    	//bla2
+    	//bla3
     	
     	try {
     		Log.i("postgres","Go Postgres!");
