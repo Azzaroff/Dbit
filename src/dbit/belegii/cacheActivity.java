@@ -72,6 +72,8 @@ public class cacheActivity extends Activity {
     	String result = "";
     	long elapsedtime;
     	
+    	//bla
+    	
     	try {
     		Log.i("postgres","Go Postgres!");
 			Class.forName("org.postgresql.Driver");
