@@ -4,12 +4,14 @@ public class Query {
 	
 	public String query;
 	public String result;
-	private long query_duration;
+	private long last_use;
+	private long usage;
 	
-	public Query (String query, String result, long query_duration){
+	public Query (String query, String result, long last_use){
+		this.usage = 1;
 		this.query = query;
 		this.result = result;
-		this.query_duration = query_duration;
+		this.last_use = last_use;
 	}
 
 	public boolean equals(Object o){
@@ -19,7 +21,20 @@ public class Query {
 		return true;
 	}
 	
-	public long getDuration(){
-		return this.query_duration;
+	
+	public long incUsage(){
+		return usage++;
+	}
+	
+	public long getUsage(){
+		return usage;
+	}
+
+	public void setLast_use(long last_use) {
+		this.last_use = last_use;
+	}
+
+	public long getLast_use() {
+		return last_use;
 	}
 }

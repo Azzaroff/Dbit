@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Date;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -30,8 +31,8 @@ public class cacheActivity extends Activity {
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
-        
+        setContentView(R.layout.main); 
+   
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         //generates a new buffer
         switch(Integer.parseInt(preferences.getString("bufferType", "0"))){
@@ -44,7 +45,7 @@ public class cacheActivity extends Activity {
 	        	break;
 	        }
 	        case 2:{
-	        	buffer = new FiFo(Integer.parseInt(preferences.getString("buffersize", "3")));
+	        	buffer = new LFU(Integer.parseInt(preferences.getString("buffersize", "3")));
 	        	break;
 	        }
         }
@@ -63,7 +64,6 @@ public class cacheActivity extends Activity {
         final TextView output = (TextView) findViewById(R.id.output);
         final TextView time_output = (TextView) findViewById(R.id.time_output_0);
         final TextView time_description = (TextView) findViewById(R.id.time_0);
-        final TextView time_output_recent = (TextView) findViewById(R.id.time_output_1);
     	
     	Toast.makeText(cacheActivity.this, query.getText(), Toast.LENGTH_SHORT).show();
     
@@ -87,7 +87,7 @@ public class cacheActivity extends Activity {
 				output.append(q.result);
 				time_description.setText("Zeit (cache): ");
 				time_output.setText(""+(SystemClock.elapsedRealtime() - elapsedtime)+" ms");
-				time_output_recent.setText(""+q.getDuration()+" ms");
+				//time_output_recent.setText(""+q.getLast_use()+" ms");
 			}else{//no matching item in buffer			
 				elapsedtime = SystemClock.elapsedRealtime();
 				Statement st = conn.createStatement();
@@ -121,9 +121,8 @@ public class cacheActivity extends Activity {
 				time_output.setText(""+(elapsedtime = (SystemClock.elapsedRealtime() - elapsedtime))+" ms");
 				time_description.setText("Zeit (WAN): ");
 				//add the query and its result to the buffer
-				Query buffelem = new Query(query.getText().toString(), result, elapsedtime);
+				Query buffelem = new Query(query.getText().toString(), result, new Date().getTime());
 				buffer.add(buffelem);
-				time_output_recent.setText("-");
 			}			
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
@@ -148,8 +147,8 @@ public class cacheActivity extends Activity {
 	        	break;
 	        }
 	        case 2:{
-	        	buffer = new FiFo(Integer.parseInt(preferences.getString("buffersize", "3")));
-	        	Log.i(this.getClass().getSimpleName(), "new buffer type: FIFO");
+	        	buffer = new LFU(Integer.parseInt(preferences.getString("buffersize", "3")));
+	        	Log.i(this.getClass().getSimpleName(), "new buffer type: LFU");
 	        	break;
 	        }
         }

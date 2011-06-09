@@ -1,16 +1,18 @@
 package dbit.belegii;
 
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.Date;
+import java.util.PriorityQueue;
 
 import android.util.Log;
 
 public class LRU extends Buffer{
 
-	private Queue<Query> data = new LinkedList<Query>();
+	private PriorityQueue<Query> data;
+	private QueryComparatorLast_use comparator = new QueryComparatorLast_use();
 	
 	public LRU(int size) {
 		super(size);
+		data = new PriorityQueue<Query>(size, comparator);
 	}
 
 	@Override
@@ -19,9 +21,9 @@ public class LRU extends Buffer{
 			Log.i(this.getClass().getSimpleName(), "nothing to add, size: "+data.size());
 			return;
 		}		
-		if(data.size() == size){
-			data.poll();
-			Log.i(this.getClass().getSimpleName(), "poll");
+		if(data.size() >= this.size){
+			Query erased = data.poll();
+			Log.i(this.getClass().getSimpleName(), "polled: "+erased.query+" with "+erased.getLast_use()+" ms");
 		}
 		
 		data.offer(query);
@@ -34,7 +36,9 @@ public class LRU extends Buffer{
 			if(result.query.equals(query)){
 				Log.i(this.getClass().getSimpleName(), "result found in cache");
 				data.remove(result);
+				result.setLast_use(new Date().getTime());
 				data.offer(result);
+				Log.i(this.getClass().getSimpleName(), "Query was used at: "+result.getLast_use()+" ms");
 				return result;
 			}
 		}
