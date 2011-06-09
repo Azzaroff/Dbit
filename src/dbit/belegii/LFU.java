@@ -1,8 +1,10 @@
 package dbit.belegii;
 
 
+import java.util.List;
 import java.util.PriorityQueue;
 
+import android.os.Parcel;
 import android.util.Log;
 
 public class LFU extends Buffer{
@@ -11,7 +13,7 @@ public class LFU extends Buffer{
 	private QueryComparatorUsage comparator = new QueryComparatorUsage();
 	
 	public LFU(int size) {
-		super(size);
+		super(size,2);
 		data = new PriorityQueue<Query>(size, comparator);
 	}
 	
@@ -57,6 +59,19 @@ public class LFU extends Buffer{
 	@Override
 	public void clear() {
 		data.clear();		
+	}
+
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeInt(size);
+		dest.writeInt(bufferTypeID);
+		dest.writeList((List<Query>)data);		
 	}
 
 }

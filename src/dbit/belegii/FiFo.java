@@ -1,8 +1,10 @@
 package dbit.belegii;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
+import android.os.Parcel;
 import android.util.Log;
 
 public class FiFo extends Buffer{
@@ -10,9 +12,15 @@ public class FiFo extends Buffer{
 	private Queue<Query> data = new LinkedList<Query>();
 	
 	public FiFo(int size) {
-		super(size);
+		super(size, 0);
 	}
 	
+	@SuppressWarnings("unchecked")
+	public FiFo(Parcel in) {
+		super(in.readInt(), in.readInt());
+		in.readList((List<Query>)this.data, null);
+	}
+
 	@Override
 	public void add(Query query) {
 		if(contains(query)){
@@ -52,5 +60,28 @@ public class FiFo extends Buffer{
 	public void clear() {
 		data.clear();		
 	}
+	
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeInt(size);
+		dest.writeInt(bufferTypeID);
+		dest.writeList((List<Query>)data);		
+	}
+	
+    public static final Creator<FiFo> CREATOR = new Creator<FiFo>() {
+        public FiFo createFromParcel(Parcel in) {
+            return new FiFo(in);
+        }
+
+        public FiFo[] newArray(int size) {
+            return new FiFo[size];
+        }
+    };
 
 }

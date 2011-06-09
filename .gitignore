@@ -1,3 +1,5 @@
 *.class
 *.apk
-./bin
+*.dex
+bin/dbit/belegii/cacheActivity.class
+./bin/*

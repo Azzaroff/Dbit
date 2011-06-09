@@ -23,6 +23,13 @@ import android.widget.Toast;
 public class cacheActivity extends Activity {
     private Buffer buffer = new LRU(3);
     
+    //content
+	private EditText query;
+    private TextView output;
+    private TextView time_output;
+    private TextView time_description;
+    private TextView time_output_recent;
+    
     //preferences
     SharedPreferences preferences;
 	
@@ -32,8 +39,17 @@ public class cacheActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         
+        //fill content objects
+    	query = (EditText)findViewById(R.id.edit);
+        output = (TextView) findViewById(R.id.output);
+        time_output = (TextView) findViewById(R.id.time_output_0);
+        time_description = (TextView) findViewById(R.id.time_0);
+        time_output_recent = (TextView) findViewById(R.id.time_output_1);
+        //done
+        
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         //generates a new buffer
+        /*
         switch(Integer.parseInt(preferences.getString("bufferType", "0"))){
 	        case 0:{
 	        	buffer = new FiFo(Integer.parseInt(preferences.getString("buffersize", "3")));
@@ -48,6 +64,11 @@ public class cacheActivity extends Activity {
 	        	break;
 	        }
         }
+        */
+        if(savedInstanceState != null && !savedInstanceState.isEmpty()){
+        	buffer = savedInstanceState.getParcelable("buffer");
+        }
+        Log.d(this.getClass().getSimpleName(), "onCreate");
     }
 
 	@Override
@@ -59,12 +80,12 @@ public class cacheActivity extends Activity {
 	}
     
     public void startQuery(View view) {
-    	final EditText query = (EditText)findViewById(R.id.edit);
-        final TextView output = (TextView) findViewById(R.id.output);
-        final TextView time_output = (TextView) findViewById(R.id.time_output_0);
-        final TextView time_description = (TextView) findViewById(R.id.time_0);
-        final TextView time_output_recent = (TextView) findViewById(R.id.time_output_1);
-        
+//    	  final EditText query = (EditText)findViewById(R.id.edit);
+//        final TextView output = (TextView) findViewById(R.id.output);
+//        final TextView time_output = (TextView) findViewById(R.id.time_output_0);
+//        final TextView time_description = (TextView) findViewById(R.id.time_0);
+//        final TextView time_output_recent = (TextView) findViewById(R.id.time_output_1);
+
     	Toast.makeText(cacheActivity.this, query.getText(), Toast.LENGTH_SHORT).show();
     
     	output.setText("");
@@ -72,8 +93,6 @@ public class cacheActivity extends Activity {
     	String result = "";
     	long elapsedtime;
     	
-    	//blabla
-    	//bla
     	
     	try {
     		Log.i("postgres","Go Postgres!");
@@ -97,7 +116,8 @@ public class cacheActivity extends Activity {
 	
 				//check, if the statement changes DB entries
 				if((statement.toLowerCase()).contains("insert") || statement.toLowerCase().contains("update")){ //if it changes something, the buffer will be cleared
-					//todo: intelligenteres Vorgehen! vlt. nur die betroffenen Zeilen aus dem Buffer löschen o.ä. 
+					//TODO: intelligenteres Vorgehen! vlt. nur die betroffenen Zeilen aus dem Buffer löschen o.ä. 
+					//TODO: wenn etwas an der DB verändert wird, dann puffer anpassen und diesen aufrug nicht im puffer speichern
 					buffer.clear();
 				}
 				
@@ -135,8 +155,15 @@ public class cacheActivity extends Activity {
     @Override
     public void onResume(){
     	super.onResume();
-    	//generates a new buffer
-        switch(Integer.parseInt(preferences.getString("bufferType", "0"))){
+    	
+    	//generates a new buffer if it is necessary
+//    	SharedPreferences tmp_pref = PreferenceManager.getDefaultSharedPreferences(this);
+    	if(buffer == null ||
+    			!(buffer.bufferTypeID == Integer.parseInt((preferences.getString("bufferType", "-1")))) ||
+    			!(buffer.size == Integer.parseInt((preferences.getString("buffersize", "-1"))))){
+    		Log.i(this.getClass().getSimpleName(), "new buffer type: "+preferences.getString("bufferType", "0"));
+    		Log.i(this.getClass().getSimpleName(), "new buffer size: "+preferences.getString("buffersize", "-1"));
+          switch(Integer.parseInt(preferences.getString("bufferType", "0"))){
 	        case 0:{
 	        	buffer = new FiFo(Integer.parseInt(preferences.getString("buffersize", "3")));
 	        	Log.i(this.getClass().getSimpleName(), "new buffer type: FIFO");
@@ -153,5 +180,40 @@ public class cacheActivity extends Activity {
 	        	break;
 	        }
         }
+    	}
+
+        Log.d(this.getClass().getSimpleName(), "onResume");
+    }
+    
+    @Override
+    public void onStart(){
+    	super.onStart();
+    	Log.d(this.getClass().getSimpleName(), "onStart");
+    }
+    
+    @Override
+    public void onPause(){
+    	super.onPause();
+    	Bundle b = new Bundle();
+    	b.putParcelable("buffer", buffer);
+    	onSaveInstanceState(b);
+    	Log.d(this.getClass().getSimpleName(), "onPause");
+    }
+    
+//    @Override
+//    public void onSaveInstanceState(Bundle savedInstanceState){
+//            super.onSaveInstanceState(savedInstanceState);
+//            savedInstanceState.putParcelable("buffer", buffer);
+//            Log.d(this.getClass().getSimpleName(), "onSave....");
+//            
+//    }
+    
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+             super.onRestoreInstanceState(savedInstanceState);
+             Log.d(this.getClass().getSimpleName(), "onRestore....");
+             if(savedInstanceState != null && !savedInstanceState.isEmpty()){
+             	buffer = savedInstanceState.getParcelable("buffer");
+             }
     }
 }
