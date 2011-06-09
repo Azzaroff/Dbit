@@ -1,8 +1,8 @@
 package dbit.belegii;
 
-import java.util.Date;
 import java.util.PriorityQueue;
 
+import android.os.SystemClock;
 import android.util.Log;
 
 public class LRU extends Buffer{
@@ -36,7 +36,7 @@ public class LRU extends Buffer{
 			if(result.query.equals(query)){
 				Log.i(this.getClass().getSimpleName(), "result found in cache");
 				data.remove(result);
-				result.setLast_use(new Date().getTime());
+				result.setLast_use(SystemClock.elapsedRealtime());
 				data.offer(result);
 				Log.i(this.getClass().getSimpleName(), "Query was used at: "+result.getLast_use()+" ms");
 				return result;

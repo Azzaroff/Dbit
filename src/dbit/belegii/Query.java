@@ -6,11 +6,13 @@ public class Query {
 	public String result;
 	private long last_use;
 	private long usage;
+	private long duration;
 	
-	public Query (String query, String result, long last_use){
+	public Query (String query, String result, long duration, long last_use){
 		this.usage = 1;
 		this.query = query;
 		this.result = result;
+		this.duration = duration;
 		this.last_use = last_use;
 	}
 
@@ -36,5 +38,9 @@ public class Query {
 
 	public long getLast_use() {
 		return last_use;
+	}
+
+	public long getDuration() {
+		return duration;
 	}
 }
