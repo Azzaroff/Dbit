@@ -115,11 +115,11 @@ public class cacheActivity extends Activity {
 				ResultSetMetaData rsmd = rs.getMetaData();
 	
 				//check, if the statement changes DB entries
-				if((statement.toLowerCase()).contains("insert") || statement.toLowerCase().contains("update")){ //if it changes something, the buffer will be cleared
-					//TODO: intelligenteres Vorgehen! vlt. nur die betroffenen Zeilen aus dem Buffer löschen o.ä. 
-					//TODO: wenn etwas an der DB verändert wird, dann puffer anpassen und diesen aufrug nicht im puffer speichern
-					buffer.clear();
-				}
+//				if((statement.toLowerCase()).contains("insert") || statement.toLowerCase().contains("update")){ //if it changes something, the buffer will be cleared
+//					//TODO: intelligenteres Vorgehen! vlt. nur die betroffenen Zeilen aus dem Buffer löschen o.ä. 
+//					//TODO: wenn etwas an der DB verändert wird, dann puffer anpassen und diesen auftrag nicht im puffer speichern
+//					buffer.clear();
+//				}
 				
 			    int numCols = rsmd.getColumnCount();
 				
@@ -140,10 +140,18 @@ public class cacheActivity extends Activity {
 				//output the elapsed time for asking postgres
 				time_output.setText(""+(elapsedtime = (SystemClock.elapsedRealtime() - elapsedtime))+" ms");
 				time_description.setText("Zeit (WAN): ");
-				//add the query and its result to the buffer
-				Query buffelem = new Query(query.getText().toString(), result, elapsedtime, SystemClock.elapsedRealtime());
-				buffer.add(buffelem);
-				time_output_recent.setText("-");
+				
+				//check, if the statement changes DB entries
+				updateChecker uc = new updateChecker();
+				String tables;
+				if((tables = uc.checkUpdate(query.getText().toString())) != null){
+					buffer.cleanBuffer(tables);
+				}else{
+					//add the query and its result to the buffer
+					Query buffelem = new Query(query.getText().toString(), result, elapsedtime, SystemClock.elapsedRealtime());
+					buffer.add(buffelem);
+					time_output_recent.setText("-");
+				}				
 			}			
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
@@ -175,8 +183,8 @@ public class cacheActivity extends Activity {
 	        	break;
 	        }
 	        case 2:{
-	        	buffer = new FiFo(Integer.parseInt(preferences.getString("buffersize", "3")));
-	        	Log.i(this.getClass().getSimpleName(), "new buffer type: FIFO");
+	        	buffer = new LFU(Integer.parseInt(preferences.getString("buffersize", "3")));
+	        	Log.i(this.getClass().getSimpleName(), "new buffer type: LFU");
 	        	break;
 	        }
         }

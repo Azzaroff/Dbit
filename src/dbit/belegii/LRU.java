@@ -67,6 +67,17 @@ public class LRU extends Buffer{
 	public void clear() {
 		data.clear();
 	}
+	
+	@Override
+	public void cleanBuffer(String tables) {
+	updateChecker uc = new updateChecker();
+		
+		for(Query q : data){
+			if(uc.checkTable(tables, q.query)){
+				data.remove(q);
+			}
+		}		
+	}
 
 	@Override
 	public int describeContents() {

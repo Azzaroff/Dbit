@@ -15,6 +15,11 @@ public abstract class Buffer implements Parcelable{
 	abstract public void add(Query query);
 	abstract public Query get(String query);
 	abstract public void clear();
+	/**
+	 * Entfernt alle Elemente aus dem Buffer, die eine der Tabellen tables enthält.
+	 * @param tables
+	 */
+	abstract public void cleanBuffer(String tables);
 }
 
 
