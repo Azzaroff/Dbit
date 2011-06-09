@@ -1,6 +1,6 @@
 package dbit.belegii;
 
-public class updateChecker {
+public final class updateChecker {
 	
 	//returns tables that need to be removed from the buffer as String e.g. String("a,b,c")
 	//return null if no match was found
