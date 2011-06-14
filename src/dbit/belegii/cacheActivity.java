@@ -104,15 +104,15 @@ public class cacheActivity extends Activity {
 			//asking the buffer
 			Query q;
 			elapsedtime = SystemClock.elapsedRealtime();
-			if((q = (buffer.get(query.getText().toString()))) != null){
+			String statement = (query.getText().toString()+";");
+			if((q = (buffer.get(statement))) != null){
 				output.append(q.result);
 				time_description.setText("Zeit (cache): ");
 				time_output.setText(""+(SystemClock.elapsedRealtime() - elapsedtime)+" ms");
 				time_output_recent.setText(""+q.getDuration()+" ms");
 			}else{//no matching item in buffer			
 				elapsedtime = SystemClock.elapsedRealtime();
-				Statement st = conn.createStatement();
-				String statement = (query.getText().toString()+";");
+				Statement st = conn.createStatement();				
 				ResultSet rs = st.executeQuery(statement);
 				ResultSetMetaData rsmd = rs.getMetaData();
 				
