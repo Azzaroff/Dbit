@@ -10,7 +10,7 @@ public final class updateChecker {
 	//returns tables that need to be removed from the buffer as String e.g. String("a,b,c")
 	//return null if no match was found
 	public String checkUpdate(String sql){
-		Pattern p = Pattern.compile("\\(?(select|update|insert)\\s+(\\*|\\w*\\,?)\\s+(from)\\s+([a-zA-Z_0-9\\s\\,]*)(\\s+(where)?\\s+(.*)\\)?)*");//(where)\\s+(.*|\\(.*\\))");
+		Pattern p = Pattern.compile("\\(?(select|update|insert\\sinto|delete)\\s+([a-zA-Z_0-9\\s\\,\\)\\(\\*]*\\,?)\\s+(from|values\\([\\w']+\\))\\s*([a-zA-Z_0-9\\s\\,]*)(\\s+(where)?\\s+(.*)\\)?)*;");//(where)\\s+(.*|\\(.*\\))");
 		Matcher m = p.matcher(sql);
 		boolean b = m.matches();
 		
@@ -18,10 +18,16 @@ public final class updateChecker {
 		while (b){
 		   	int count = m.groupCount();
 
-		   	if(m.group(1).contains("update")) 
+		   	if((m.group(1).contains("update"))||(m.group(1).contains("delete"))) 
 		   		tables+=","+m.group(4);
+		   	else if(m.group(1).contains("insert"))
+		   		tables+=","+m.group(2);
 		    String last = m.group(count);
-		    if(last.charAt(last.length()-1)==')') 
+		    while(last == null){
+		    	count--;
+		    	last = m.group(count);
+		    }
+		    if(last.length()>1 && last.charAt(last.length()-1)==')') 
 		    	last=last.substring(0, last.length()-1);
 		    m = p.matcher(last);
 		    b = m.matches();
@@ -36,7 +42,7 @@ public final class updateChecker {
 	//returns true if table was found in sql query
 	//otherwise returns false
 	public boolean checkTable(String tables,String sql){
-		Pattern p = Pattern.compile("\\(?(select|update|insert)\\s+(\\*|\\w*\\,?)\\s+(from)\\s+([a-zA-Z_0-9\\s\\,]*)(\\s+(where)?\\s+(.*))*\\)?");//(where)\\s+(.*|\\(.*\\))");
+		Pattern p = Pattern.compile("\\(?(select|update|insert\\sinto|delete)\\s+([a-zA-Z_0-9\\s\\,\\)\\(\\*]*\\,?)\\s+(from|values\\([\\w']+\\))\\s*([a-zA-Z_0-9\\s\\,\\)]*)(\\s+(where)?\\s+(.*)\\)?)*;");//(where)\\s+(.*|\\(.*\\))");
 		Matcher m = p.matcher(sql);
 		boolean b = m.matches();
 		
