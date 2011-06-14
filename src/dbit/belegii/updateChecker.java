@@ -10,7 +10,7 @@ public final class updateChecker {
 	//returns tables that need to be removed from the buffer as String e.g. String("a,b,c")
 	//return null if no match was found
 	public String checkUpdate(String sql){
-		Pattern p = Pattern.compile("\\(?(select|update|insert)\\s+(\\*|\\w*\\,?)\\s+(from)\\s+([a-zA-Z_0-9\\s\\,]*)(\\s+(where)?\\s+(.*)\\)?)*");//(where)\\s+(.*|\\(.*\\))");
+		Pattern p = Pattern.compile("\\(?(select|update|insert|create|delete)\\s+(\\*|\\w*\\,?)\\s+(from)\\s+([a-zA-Z_0-9\\s\\,]*)(\\s+(where)?\\s+(.*)\\)?)*");//(where)\\s+(.*|\\(.*\\))");
 		Matcher m = p.matcher(sql);
 		boolean b = m.matches();
 		
@@ -36,7 +36,7 @@ public final class updateChecker {
 	//returns true if table was found in sql query
 	//otherwise returns false
 	public boolean checkTable(String tables,String sql){
-		Pattern p = Pattern.compile("\\(?(select|update|insert)\\s+(\\*|\\w*\\,?)\\s+(from)\\s+([a-zA-Z_0-9\\s\\,]*)(\\s+(where)?\\s+(.*))*\\)?");//(where)\\s+(.*|\\(.*\\))");
+		Pattern p = Pattern.compile("\\(?(select|update|insert|create|delete)\\s+(\\*|\\w*\\,?)\\s+(from)\\s+([a-zA-Z_0-9\\s\\,]*)(\\s+(where)?\\s+(.*))*\\)?");//(where)\\s+(.*|\\(.*\\))");
 		Matcher m = p.matcher(sql);
 		boolean b = m.matches();
 		
