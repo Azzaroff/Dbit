@@ -7,6 +7,8 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.postgresql.util.PSQLException;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -112,9 +114,25 @@ public class cacheActivity extends Activity {
 				time_output_recent.setText(""+q.getDuration()+" ms");
 			}else{//no matching item in buffer			
 				elapsedtime = SystemClock.elapsedRealtime();
+				
+//				if(statement.equals("los;")){
+//					for (int i = 0; i < 10000; ++i){
+//						statement = "insert into b values("+(int)(Math.random() * 1000)+");";
+//						Statement st0 = conn.createStatement();
+//						try{
+//						st0.executeQuery(statement);
+//						}catch(SQLException e){
+//							//Log.i(this.getClass().getSimpleName(), "catch");
+//						}
+//						st0.close();
+//					}
+//				}
+				
 				Statement st = conn.createStatement();				
 				ResultSet rs = st.executeQuery(statement);
 				ResultSetMetaData rsmd = rs.getMetaData();
+				
+				
 				
 				//check, if the statement changes DB entries
 //				if((statement.toLowerCase()).contains("insert") || statement.toLowerCase().contains("update")){ //if it changes something, the buffer will be cleared
