@@ -112,10 +112,10 @@ public class cacheActivity extends Activity {
 			}else{//no matching item in buffer			
 				elapsedtime = SystemClock.elapsedRealtime();
 				Statement st = conn.createStatement();
-				String statement = query.getText().toString();
+				String statement = (query.getText().toString()+";");
 				ResultSet rs = st.executeQuery(statement);
 				ResultSetMetaData rsmd = rs.getMetaData();
-	
+				
 				//check, if the statement changes DB entries
 //				if((statement.toLowerCase()).contains("insert") || statement.toLowerCase().contains("update")){ //if it changes something, the buffer will be cleared
 //					//TODO: intelligenteres Vorgehen! vlt. nur die betroffenen Zeilen aus dem Buffer löschen o.ä. 
@@ -146,11 +146,11 @@ public class cacheActivity extends Activity {
 				//check, if the statement changes DB entries
 				updateChecker uc = new updateChecker();
 				String tables;
-				if((tables = uc.checkUpdate(query.getText().toString())) != null){
+				if((tables = uc.checkUpdate(statement)) != null){
 					buffer.cleanBuffer(tables);
 				}else{
 					//add the query and its result to the buffer
-					Query buffelem = new Query(query.getText().toString(), result, elapsedtime, SystemClock.elapsedRealtime());
+					Query buffelem = new Query(statement, result, elapsedtime, SystemClock.elapsedRealtime());
 					buffer.add(buffelem);
 					time_output_recent.setText("-");
 				}				
