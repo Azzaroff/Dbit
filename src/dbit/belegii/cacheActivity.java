@@ -75,6 +75,8 @@ public class cacheActivity extends Activity {
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if(keyCode == KeyEvent.KEYCODE_MENU){
 			startActivity(new Intent(this, Preferences.class));
+		}else if(keyCode == KeyEvent.KEYCODE_BACK){
+			finish();
 		}
 	    return(true);
 	}
