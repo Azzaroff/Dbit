@@ -97,6 +97,7 @@ public class cacheActivity extends Activity {
     	String result = "";
     	long elapsedtime;
     	
+    	ResultSet rs;
     	
     	try {
     		Log.i("postgres","Go Postgres!");
@@ -128,9 +129,14 @@ public class cacheActivity extends Activity {
 //					}
 //				}
 				
-				Statement st = conn.createStatement();				
-				ResultSet rs = st.executeQuery(statement);
-				ResultSetMetaData rsmd = rs.getMetaData();
+				Statement st = conn.createStatement();
+				//checks if it was an sql statement containing insert into, update or delete
+				updateChecker uc = new updateChecker();
+				if(uc.checkUpdate(statement) != null){
+					st.executeUpdate(statement);
+				}else{				
+					rs = st.executeQuery(statement);
+					ResultSetMetaData rsmd = rs.getMetaData();
 				
 				
 				
@@ -141,28 +147,29 @@ public class cacheActivity extends Activity {
 //					buffer.clear();
 //				}
 				
-			    int numCols = rsmd.getColumnCount();
-				
-				while (rs.next()) {
-					Log.i("postgres","getting one column");
-					String row = "";
-				    for (int i = 1; i <= numCols; i++) {
-				    	 row = row + "| " + rs.getString(i);
+				    int numCols = rsmd.getColumnCount();
+					
+					while (rs.next()) {
+						Log.i("postgres","getting one column");
+						String row = "";
+					    for (int i = 1; i <= numCols; i++) {
+					    	 row = row + "| " + rs.getString(i);
+						}
+					    row = row + " |";
+					    Log.i("postgres",row);
+					    output.append(row + "\n");
+					    result += row;
+					    result += "\n";
 					}
-				    row = row + " |";
-				    Log.i("postgres",row);
-				    output.append(row + "\n");
-				    result += row;
-				    result += "\n";
+					rs.close();
+					st.close();
 				}
-				rs.close();
-				st.close();
 				//output the elapsed time for asking postgres
 				time_output.setText(""+(elapsedtime = (SystemClock.elapsedRealtime() - elapsedtime))+" ms");
 				time_description.setText("Zeit (WAN): ");
 				
 				//check, if the statement changes DB entries
-				updateChecker uc = new updateChecker();
+				
 				String tables;
 				if((tables = uc.checkUpdate(statement)) != null){
 					buffer.cleanBuffer(tables);
