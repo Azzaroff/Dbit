@@ -31,6 +31,7 @@ public class cacheActivity extends Activity {
     private TextView time_output;
     private TextView time_description;
     private TextView time_output_recent;
+    private TextView buff_size_output;
     
     //preferences
     SharedPreferences preferences;
@@ -42,11 +43,12 @@ public class cacheActivity extends Activity {
         setContentView(R.layout.main);
         
         //fill content objects
-    	query = (EditText)findViewById(R.id.edit);
-        output = (TextView) findViewById(R.id.output);
-        time_output = (TextView) findViewById(R.id.time_output_0);
-        time_description = (TextView) findViewById(R.id.time_0);
-        time_output_recent = (TextView) findViewById(R.id.time_output_1);
+    	query 				= (EditText) findViewById(R.id.edit);
+        output 				= (TextView) findViewById(R.id.output);
+        time_output 		= (TextView) findViewById(R.id.time_output_0);
+        time_description 	= (TextView) findViewById(R.id.time_0);
+        time_output_recent 	= (TextView) findViewById(R.id.time_output_1);
+        buff_size_output	= (TextView) findViewById(R.id.buff_size_output_0);
         //done
         
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -178,7 +180,10 @@ public class cacheActivity extends Activity {
 					Query buffelem = new Query(statement, result, elapsedtime, SystemClock.elapsedRealtime());
 					buffer.add(buffelem);
 					time_output_recent.setText("-");
-				}				
+				}
+				
+				//update buffer size output
+				buff_size_output.setText(buffer.getNumberofElements()+" / "+buffer.size);
 			}			
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
@@ -216,7 +221,8 @@ public class cacheActivity extends Activity {
 	        }
         }
     	}
-
+    	//update buffer size output
+    	buff_size_output.setText(buffer.getNumberofElements()+" / "+buffer.size);
         Log.d(this.getClass().getSimpleName(), "onResume");
     }
     

@@ -94,4 +94,9 @@ public class FiFo extends Buffer{
             return new FiFo[size];
         }
     };
+
+	@Override
+	public int getNumberofElements() {
+		return data.size();
+	}
 }

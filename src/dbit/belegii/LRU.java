@@ -101,4 +101,9 @@ public class LRU extends Buffer{
             return new LRU[size];
         }
     };
+
+	@Override
+	public int getNumberofElements() {
+		return data.size();
+	}
 }

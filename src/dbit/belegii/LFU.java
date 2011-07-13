@@ -86,5 +86,10 @@ public class LFU extends Buffer{
 		dest.writeList((List<Query>)data);		
 	}
 
+	@Override
+	public int getNumberofElements() {
+		return data.size();
+	}
+
 
 }
