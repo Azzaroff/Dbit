@@ -1,22 +1,25 @@
-package dbit.belegii;
+package tree.database;
 
-import java.util.LinkedList;
+
 import java.util.List;
-import java.util.Queue;
+import java.util.PriorityQueue;
 
 import android.os.Parcel;
+import android.os.SystemClock;
 import android.util.Log;
 
-public class FiFo extends Buffer{
+public class LRU extends Buffer{
 
-	private Queue<Query> data = new LinkedList<Query>();
+	private PriorityQueue<Query> data;
+	private QueryComparatorLast_use comparator = new QueryComparatorLast_use();
 	
-	public FiFo(int size) {
-		super(size, 0);
+	public LRU(int size) {
+		super(size, 1);
+		data = new PriorityQueue<Query>(size, comparator);
 	}
 	
 	@SuppressWarnings("unchecked")
-	public FiFo(Parcel in) {
+	public LRU(Parcel in) {
 		super(in.readInt(), in.readInt());
 		in.readList((List<Query>)this.data, null);
 	}
@@ -27,9 +30,9 @@ public class FiFo extends Buffer{
 			Log.i(this.getClass().getSimpleName(), "nothing to add, size: "+data.size());
 			return;
 		}		
-		if(data.size() == size){
-			data.poll();
-			Log.i(this.getClass().getSimpleName(), "poll");
+		if(data.size() >= this.size){
+			Query erased = data.poll();
+			Log.i(this.getClass().getSimpleName(), "polled: "+erased.query+" with "+erased.getLast_use()+" ms");
 		}
 		
 		data.offer(query);
@@ -41,6 +44,10 @@ public class FiFo extends Buffer{
 		for(Query result : data){
 			if(result.query.equals(query)){
 				Log.i(this.getClass().getSimpleName(), "result found in cache");
+				data.remove(result);
+				result.setLast_use(SystemClock.elapsedRealtime());
+				data.offer(result);
+				Log.i(this.getClass().getSimpleName(), "Query was used at: "+result.getLast_use()+" ms");
 				return result;
 			}
 		}
@@ -58,12 +65,12 @@ public class FiFo extends Buffer{
 
 	@Override
 	public void clear() {
-		data.clear();		
+		data.clear();
 	}
 	
 	@Override
 	public void cleanBuffer(String tables) {
-		updateChecker uc = new updateChecker();
+	updateChecker uc = new updateChecker();
 		
 		for(Query q : data){
 			if(uc.checkTable(tables, q.query)){
@@ -71,7 +78,7 @@ public class FiFo extends Buffer{
 			}
 		}		
 	}
-	
+
 	@Override
 	public int describeContents() {
 		return 0;
@@ -85,13 +92,13 @@ public class FiFo extends Buffer{
 		dest.writeList((List<Query>)data);		
 	}
 	
-    public static final Creator<FiFo> CREATOR = new Creator<FiFo>() {
-        public FiFo createFromParcel(Parcel in) {
-            return new FiFo(in);
+    public static final Creator<LRU> CREATOR = new Creator<LRU>() {
+        public LRU createFromParcel(Parcel in) {
+            return new LRU(in);
         }
 
-        public FiFo[] newArray(int size) {
-            return new FiFo[size];
+        public LRU[] newArray(int size) {
+            return new LRU[size];
         }
     };
 

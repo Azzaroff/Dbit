@@ -1,4 +1,4 @@
-package dbit.belegii;
+package tree.database;
 
 import android.os.Bundle;
 import android.preference.PreferenceActivity;

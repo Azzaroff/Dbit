@@ -1,4 +1,4 @@
-package dbit.belegii;
+package tree.database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -6,8 +6,6 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-
-import org.postgresql.util.PSQLException;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -43,12 +41,12 @@ public class cacheActivity extends Activity {
         setContentView(R.layout.main);
         
         //fill content objects
-    	query 				= (EditText) findViewById(R.id.edit);
-        output 				= (TextView) findViewById(R.id.output);
-        time_output 		= (TextView) findViewById(R.id.time_output_0);
-        time_description 	= (TextView) findViewById(R.id.time_0);
-        time_output_recent 	= (TextView) findViewById(R.id.time_output_1);
-        buff_size_output	= (TextView) findViewById(R.id.buff_size_output_0);
+//    	query 				= (EditText) findViewById(R.id.edit);
+//        output 				= (TextView) findViewById(R.id.output);
+//        time_output 		= (TextView) findViewById(R.id.time_output_0);
+//        time_description 	= (TextView) findViewById(R.id.time_0);
+//        time_output_recent 	= (TextView) findViewById(R.id.time_output_1);
+//        buff_size_output	= (TextView) findViewById(R.id.buff_size_output_0);
         //done
         
         preferences = PreferenceManager.getDefaultSharedPreferences(this);

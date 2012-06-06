@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello">Hello World, cacheActivity!</string>
-    <string name="app_name">DBit_Beleg</string>
+    <string name="app_name">BaumDB</string>
+    <string name="browseTabText">Browse</string>
+    <string name="createTabText">Create</string>
+    <string name="settingsTabText">Settings</string>
+    <string name="nearTabText">near</string>
+    <string name="recentTabText">recent</string>
+    <string name="allTabText">all</string>
+    <string name="searchText">search</string>
 </resources>
