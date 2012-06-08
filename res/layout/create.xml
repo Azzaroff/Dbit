@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" 
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    >
+<LinearLayout
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+    
+    <ImageView 
+        android:id="@+id/pictureView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="15dip"
+        android:contentDescription="@string/pictureButtonText"/>
+    
+    <Button 
+        android:id="@+id/pictureButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/pictureButtonText"
+        android:layout_gravity="center_horizontal"
+        />
+    
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+		<TextView
+		  	android:layout_width="fill_parent"
+		  	android:layout_height="fill_parent"
+		  	android:text="@string/nameLabel"
+		  	android:layout_weight=".5"/>
+		<EditText
+		  	android:id="@+id/nametext"
+		  	android:layout_width="fill_parent"
+		  	android:layout_height="fill_parent"
+		  	android:inputType="text"
+		  	android:layout_weight=".2"/>
+    </LinearLayout>
+    
+        <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+		<TextView
+		  	android:layout_width="fill_parent"
+		  	android:layout_height="fill_parent"
+		  	android:text="@string/ageLabel"
+		  	android:layout_weight=".5"/>
+		<EditText
+		  	android:id="@+id/agetext"
+		  	android:layout_width="fill_parent"
+		  	android:layout_height="fill_parent"
+		  	android:inputType="number"
+		  	android:layout_weight=".2"/>
+    </LinearLayout>
+    
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+		<TextView
+		  	android:layout_width="fill_parent"
+		  	android:layout_height="fill_parent"
+		  	android:text="@string/sizeLabel"
+		  	android:layout_weight=".5"/>
+		<EditText
+		  	android:id="@+id/sizetext"
+		  	android:layout_width="fill_parent"
+		  	android:layout_height="fill_parent"
+		  	android:inputType="number"
+		  	android:layout_weight=".2"/>
+    </LinearLayout>
+    
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+		<TextView
+		  	android:layout_width="fill_parent"
+		  	android:layout_height="fill_parent"
+		  	android:text="@string/optionsLabel"
+		  	android:layout_weight=".5"/>
+		<ToggleButton
+		  	android:id="@+id/locationToggle"
+		  	android:layout_width="fill_parent"
+		  	android:layout_height="fill_parent"
+		  	android:textOn="@string/locationToggleOn"
+		  	android:textOff="@string/locationToggleOff"
+		  	android:layout_gravity="left"
+		  	android:layout_weight=".2"/>
+    </LinearLayout>
+    
+    <Button 
+        android:id="@+id/createButton"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/createButtonText"
+        />
+</LinearLayout>
+</ScrollView>

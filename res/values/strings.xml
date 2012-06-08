@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">BaumDB</string>
+    <string name="app_name">TreeDB</string>
     <string name="browseTabText">Browse</string>
     <string name="createTabText">Create</string>
     <string name="settingsTabText">Settings</string>
@@ -8,4 +8,34 @@
     <string name="recentTabText">recent</string>
     <string name="allTabText">all</string>
     <string name="searchText">search</string>
+    
+    <string name="nameLabel">Name</string>
+    <string name="positionLabel">Position</string>
+    <string name="commentLabel">Write a comment</string>
+    
+    <string name="ageLabel">Age</string>
+    <string name="sizeLabel">Size(m)</string>
+    <string name="optionsLabel">Options</string>
+    
+    <string name="pictureButtonText">Take a photo!</string>
+    <string name="locationToggleOn">include Location</string>
+    <string name="locationToggleOff">exclude Location</string>
+    <string name="createButtonText">Submit</string>
+    
+    <string name="avatarImage">Avatar</string>
+    <string name="pwdButton">Change Password</string>
+    <string name="delButton">Delete Account</string>
+    
+    <string name="myTreeList">My Trees</string>
+    <string name="groupList">Groups</string>
+    
+    <string name="pwdLabel">Password</string>
+    <string name="logonLabel">Logon</string>
+    <string name="createUserLabel">create new User</string>
+    <string name="createUserButtonText">create</string>
+    <string name="nameFailure">Please fill in your name.</string>
+    <string name="pwdFailure">Please fill in your password.</string>
+    <string name="avatarFailure">Please add an avatar.</string>
+    <string name="miscFailure">An unknown failure ocurred.</string>
+    
 </resources>
