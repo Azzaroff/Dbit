@@ -17,8 +17,9 @@ import android.view.View;
 	        this.history = new ArrayList<View>();
 	        group = this;
 	        
-	        View view = getLocalActivityManager().startActivity("Near", 
-	                new Intent(this, BrowseTabActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)).getDecorView();
+	        Intent intent = new Intent(this, BrowseTabActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); 
+	        intent.putExtras(getIntent().getExtras());
+	        View view = getLocalActivityManager().startActivity("Near", intent).getDecorView();
 	        
 	        replaceView(view);
 	    }

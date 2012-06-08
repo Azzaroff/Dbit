@@ -16,9 +16,10 @@ public class MainTabGroup3Activity extends ActivityGroup{
         super.onCreate(savedInstanceState);
         this.history = new ArrayList<View>();
         group = this;
-        
-        View view = getLocalActivityManager().startActivity("Settings", 
-                new Intent(this, SettingsActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)).getDecorView();
+
+        Intent intent =  new Intent(this, SettingsActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtras(getIntent().getExtras());
+        View view = getLocalActivityManager().startActivity("Settings", intent).getDecorView();
         
         setContentView(view);
     }

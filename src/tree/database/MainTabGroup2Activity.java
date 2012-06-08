@@ -28,8 +28,9 @@ public class MainTabGroup2Activity extends ActivityGroup{
         this.history = new ArrayList<View>();
         group = this;
         
-        View view = getLocalActivityManager().startActivity("Create", 
-                new Intent(this, CreateActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)).getDecorView();
+        Intent intent = new Intent(this, CreateActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtras(getIntent().getExtras());
+        View view = getLocalActivityManager().startActivity("Create", intent).getDecorView();
         
         setContentView(view);
     }

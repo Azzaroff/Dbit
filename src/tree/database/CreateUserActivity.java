@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import tree.database.data.User;
 import tree.database.services.DatabaseHandler;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -36,6 +36,8 @@ public class CreateUserActivity extends Activity{
 	private Bitmap avatar;
 	
 	private DatabaseHandler dbhandler;
+	
+	private User user;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +48,7 @@ public class CreateUserActivity extends Activity{
 //		toast = Toast.makeText(context, text, duration);
 		
 		dbhandler = new DatabaseHandler();
+		user = new User();
 		
 		photoButton = (Button)findViewById(R.id.pictureButton);
 		createButton = (Button)findViewById(R.id.createUserButton);
@@ -69,35 +72,28 @@ public class CreateUserActivity extends Activity{
 				//test, if all fields were filled
 				
 				if(name.getText().length() == 0){
-					toast = Toast.makeText(getApplicationContext(), getText(R.string.nameFailure) , Toast.LENGTH_SHORT);
+					toast = Toast.makeText(getApplicationContext(), getText(R.string.nameFailure) , Toast.LENGTH_LONG);
+					toast.show();
 					return;
 				}
 				if(password.getText().length() == 0){
-					toast = Toast.makeText(getApplicationContext(), getText(R.string.pwdFailure) , Toast.LENGTH_SHORT);
+					toast = Toast.makeText(getApplicationContext(), getText(R.string.pwdFailure) , Toast.LENGTH_LONG);
+					toast.show();
 					return;
 				}
 				Log.i(this.getClass().getSimpleName(), "Create Button");
 				File file = new File(AVATAR_PATH);
 				//insert new user into database
 				if(avatar != null){
-					if(dbhandler.addUser(name.getText().toString(), password.getText().toString(), 0, avatar)){
+					user = new User(name.getText().toString(), password.getText().toString(), 0, avatar);
+					if(dbhandler.addUser(user)){
 						file.delete(); // remove the picture from the sd card
 						Intent intent = new Intent(CreateUserActivity.this, MainActivity.class);
+						intent.putExtra("UserData", user);
 						startActivity(intent);
 					}else{
-						toast = Toast.makeText(getApplicationContext(), getText(R.string.miscFailure) , Toast.LENGTH_SHORT);
-					}
-				}else{
-					if(file.exists()){
-						if(dbhandler.addUser(name.getText().toString(), password.getText().toString(), 0, avatar)){
-							file.delete(); // remove the picture from the sd card
-							Intent intent = new Intent(CreateUserActivity.this, MainActivity.class);
-							startActivity(intent);
-						}else{
-							toast = Toast.makeText(getApplicationContext(), getText(R.string.miscFailure) , Toast.LENGTH_SHORT);
-						}
-					}else{
-						toast = Toast.makeText(getApplicationContext(), getText(R.string.avatarFailure) , Toast.LENGTH_SHORT);
+						toast = Toast.makeText(getApplicationContext(), getText(R.string.miscFailure) , Toast.LENGTH_LONG);
+						toast.show();
 					}
 				}
 			}

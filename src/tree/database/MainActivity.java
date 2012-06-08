@@ -1,5 +1,6 @@
 package tree.database;
 
+import tree.database.data.User;
 import android.app.TabActivity;
 import android.content.Context;
 import android.content.Intent;
@@ -14,7 +15,7 @@ import android.widget.TextView;
 
 public class MainActivity extends TabActivity{
 
-private TabHost tabHost;
+	private TabHost tabHost;
 	
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
@@ -22,6 +23,7 @@ private TabHost tabHost;
 	    
 	    requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);	    
         setContentView(R.layout.main); 
+        Bundle extras = getIntent().getExtras();
 //        getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.logotitle);
 
 //        setContentView(R.layout.main);
@@ -47,10 +49,10 @@ private TabHost tabHost;
 //	    tabHost.addTab(spec);
 	    
 	    
-	    tabHost.getTabWidget().setDividerDrawable(R.drawable.tab_divider);
-	    setupTab(new TextView(this), (String)getText(R.string.browseTabText), new Intent(this, MainTabGroup1Activity.class));
-	    setupTab(new TextView(this), (String)getText(R.string.createTabText), new Intent(this, MainTabGroup2Activity.class));
-	    setupTab(new TextView(this), (String)getText(R.string.settingsTabText), new Intent(this, MainTabGroup3Activity.class));
+	    tabHost.getTabWidget().setDividerDrawable(R.drawable.tab_divider);	    
+	    setupTab(new TextView(this), (String)getText(R.string.browseTabText), new Intent(this, MainTabGroup1Activity.class), extras);
+	    setupTab(new TextView(this), (String)getText(R.string.createTabText), new Intent(this, MainTabGroup2Activity.class), extras);
+	    setupTab(new TextView(this), (String)getText(R.string.settingsTabText), new Intent(this, MainTabGroup3Activity.class), extras);
 
 	    tabHost.setCurrentTab(0);
 	}
@@ -69,7 +71,8 @@ private TabHost tabHost;
         return true;
     }
 	 
-	 private void setupTab(final View view, final String tag, Intent content) {
+	 private void setupTab(final View view, final String tag, Intent content, Bundle extras) {
+		content.putExtras(extras);
  	    View tabview = createTabView(tabHost.getContext(), tag);
  	        TabSpec setContent = tabHost.newTabSpec(tag).setIndicator(tabview).setContent(content);
  	    tabHost.addTab(setContent);

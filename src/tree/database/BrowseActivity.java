@@ -29,7 +29,8 @@ public class BrowseActivity extends Activity{
 	    
 	    tabHost = (TabHost) findViewById(android.R.id.tabhost);
 	    mlam.dispatchCreate(savedInstanceState);
-        tabHost.setup(mlam); 
+        tabHost.setup(mlam);
+        Bundle extras = getIntent().getExtras();
 //	    TabHost.TabSpec spec;  // Resusable TabSpec for each tab
 //
 //	    Resources res = getResources();
@@ -50,9 +51,9 @@ public class BrowseActivity extends Activity{
 //	    tabHost.addTab(spec);
 	    
 	    tabHost.getTabWidget().setDividerDrawable(R.drawable.tab_divider);
-	    setupTab(new TextView(this), (String)getText(R.string.nearTabText), new Intent(this, BrowseTabGroup1Activity.class));
-	    setupTab(new TextView(this), (String)getText(R.string.recentTabText), new Intent(this, BrowseTabGroup2Activity.class));
-	    setupTab(new TextView(this), (String)getText(R.string.allTabText), new Intent(this, BrowseTabGroup3Activity.class));
+	    setupTab(new TextView(this), (String)getText(R.string.nearTabText), new Intent(this, BrowseTabGroup1Activity.class), extras);
+	    setupTab(new TextView(this), (String)getText(R.string.recentTabText), new Intent(this, BrowseTabGroup2Activity.class), extras);
+	    setupTab(new TextView(this), (String)getText(R.string.allTabText), new Intent(this, BrowseTabGroup3Activity.class), extras);
 	    
 	    tabHost.setCurrentTab(0);	    
 	}
@@ -76,11 +77,12 @@ public class BrowseActivity extends Activity{
 	        return true;
 	    }
 	 
-	 private void setupTab(final View view, final String tag, Intent content) {
-	 	    View tabview = createTabView(tabHost.getContext(), tag);
-	 	        TabSpec setContent = tabHost.newTabSpec(tag).setIndicator(tabview).setContent(content);
-	 	    tabHost.addTab(setContent);
-		 	}
+	 private void setupTab(final View view, final String tag, Intent content, Bundle extras) {
+		content.putExtras(extras);
+ 	    View tabview = createTabView(tabHost.getContext(), tag);
+ 	        TabSpec setContent = tabHost.newTabSpec(tag).setIndicator(tabview).setContent(content);
+ 	    tabHost.addTab(setContent);
+	 	}
 	 	 
  	private static View createTabView(final Context context, final String text) {
  	    View view = LayoutInflater.from(context).inflate(R.layout.tabs_bg, null);
