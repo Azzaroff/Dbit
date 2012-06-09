@@ -1,8 +1,6 @@
 package tree.database.services;
 
 import java.io.ByteArrayOutputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -11,6 +9,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 
 import tree.database.updateChecker;
 import tree.database.data.Group;
@@ -24,13 +23,42 @@ import android.util.Log;
 public class DatabaseHandler{
 
 	private Connection connection;
+	private static String URL = "jdbc:postgresql://seclab10.medien.uni-weimar.de/baumdb?user=worker&password=mindless&ssl=true&sslfactory=org.postgresql.ssl.NonValidatingFactory";
 	
 	public ArrayList<Tree> getTreeList(Location loc, double radius){
 		return new ArrayList<Tree>();
 	}
 	
-	public boolean addTree(Bitmap image, String name, Location loc, double size, int age){
-		return true;
+	public boolean addTree(int uid, Bitmap image, String name, float[] loc, double size, int age){
+		try {
+    		Log.i("postgres","Go Postgres!");
+			Class.forName("org.postgresql.Driver");
+			Connection conn = DriverManager.getConnection(URL);
+			
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			image.compress(Bitmap.CompressFormat.JPEG, 85, baos);
+			
+			PreparedStatement ps = conn.prepareStatement("INSERT INTO trees (long, lat, date, uid, size, age, name) VALUES (?, ?, ?, ?, ?, ?, ?);");
+			ps.setDouble(1, loc[1]);
+			ps.setDouble(2, loc[2]);
+			Date d = new Date();
+			ps.setDate(3, (java.sql.Date) d);
+			ps.setInt(4, uid);
+			ps.setDouble(5, size);
+			ps.setInt(6, age);
+			ps.setString(7, name);
+			
+			if(ps.executeUpdate() >= 1){
+				return true;
+			}
+			ps.close();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+    	return false;
 	}
 	
 	public boolean updateTree(Tree tree){
@@ -54,8 +82,7 @@ public class DatabaseHandler{
 		try {
     		Log.i("postgres","Go Postgres!");
 			Class.forName("org.postgresql.Driver");
-			String url = "jdbc:postgresql://seclab10.medien.uni-weimar.de/baumdb?user=worker&password=mindless&ssl=true&sslfactory=org.postgresql.ssl.NonValidatingFactory";
-			Connection conn = DriverManager.getConnection(url);
+			Connection conn = DriverManager.getConnection(URL);
 			
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			user.Avatar.compress(Bitmap.CompressFormat.JPEG, 85, baos);
@@ -88,8 +115,7 @@ public class DatabaseHandler{
     	try {
     		Log.i("postgres","Go Postgres!");
 			Class.forName("org.postgresql.Driver");
-			String url = "jdbc:postgresql://seclab10.medien.uni-weimar.de/baumdb?user=worker&password=mindless&ssl=true&sslfactory=org.postgresql.ssl.NonValidatingFactory";
-			Connection conn = DriverManager.getConnection(url);
+			Connection conn = DriverManager.getConnection(URL);
 			
 			PreparedStatement ps = conn.prepareStatement("SELECT uid, name, pw, rights FROM users WHERE (name = ?);");
 //			PreparedStatement ps = conn.prepareStatement("SELECT * FROM users WHERE (name = ? AND pw = ?);");
@@ -123,8 +149,7 @@ public class DatabaseHandler{
     	try {
     		Log.i("postgres","Go Postgres!");
 			Class.forName("org.postgresql.Driver");
-			String url = "jdbc:postgresql://seclab10.medien.uni-weimar.de/baumdb?user=worker&password=mindless&ssl=true&sslfactory=org.postgresql.ssl.NonValidatingFactory";
-			Connection conn = DriverManager.getConnection(url);
+			Connection conn = DriverManager.getConnection(URL);
 			
 			PreparedStatement ps = conn.prepareStatement("SELECT avatar FROM users WHERE (name = ? AND pw = ?);");
 			ps.setString(1, user.Name);
@@ -151,14 +176,35 @@ public class DatabaseHandler{
     	return user;
 	}
 	
+	public boolean setUserPassword(int uid, String newpassword){
+		try {
+    		Log.i("postgres","Go Postgres!");
+			Class.forName("org.postgresql.Driver");
+			Connection conn = DriverManager.getConnection(URL);
+			
+			PreparedStatement ps = conn.prepareStatement("UPDATE users SET pw=? WHERE uid = ?;");
+			ps.setString(1, newpassword);
+			ps.setInt(2, uid);
+			
+			if(ps.executeUpdate() >= 1){
+				return true;
+			}
+			ps.close();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+    	return false;
+	}
+	
 	private void processQuery(String statement){
 		ResultSet rs;
     	
     	try {
     		Log.i("postgres","Go Postgres!");
 			Class.forName("org.postgresql.Driver");
-			String url = "jdbc:postgresql://seclab10.medien.uni-weimar.de/baumdb?user=worker&password=mindless&ssl=true&sslfactory=org.postgresql.ssl.NonValidatingFactory";
-			Connection conn = DriverManager.getConnection(url);
+			Connection conn = DriverManager.getConnection(URL);
 			
 			Statement st = conn.createStatement();
 			//checks if it was an sql statement containing insert into, update or delete

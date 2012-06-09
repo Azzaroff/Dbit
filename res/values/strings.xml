@@ -39,4 +39,19 @@
     <string name="avatarFailure">Please add an avatar.</string>
     <string name="miscFailure">An unknown failure ocurred.</string>
     
+    
+    <string name="change_Title">Change password</string>
+    <string name="oldPwd">old password:</string>
+    <string name="newPwd">new password:</string>
+    <string name="repeateNewPwd">repeate new password:</string>
+    
+    <string name="ok_button">OK</string>
+    <string name="cancel_button">Cancel</string>
+    
+    <string name="no_picture">Please take a picture.</string>
+	<string name="no_name">Please insert name.</string>
+	<string name="no_size">Please insert size.</string>
+	<string name="no_age">Please insert age.</string>
+	<string name="no_loc_support">Your device does not support location information in pictures.</string>
+	<string name="db_error">An database error occured.</string>
 </resources>

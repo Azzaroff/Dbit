@@ -26,12 +26,21 @@ public class User implements Parcelable {
 		System.out.println(toString());
 	}
 	
+	public User(Parcel in){
+		readFromParcel(in);
+	}
+	
 	public String toString(){
 		return "ID: "+ID+" Name: "+Name+" Password: "+Password+" Rights: "+Rights;
 	}
 	
 	public boolean testPassword(String Password){
 		return this.Password.equals(sha256(Password));
+	}
+	
+	public String setNewPassword(String Password){
+		this.Password = sha256(Password);
+		return this.Password;
 	}
 	
 	private String sha256(String s) {
@@ -52,6 +61,20 @@ public class User implements Parcelable {
 	    }
 	    return "";
 	}
+	
+	public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+        @Override
+		public User createFromParcel(Parcel in) {
+            return new User(in);
+        }
+
+		@Override
+		public User[] newArray(int size) {
+			// TODO Auto-generated method stub
+			return new User[size];
+		}
+ 
+    };
 
 	@Override
 	public int describeContents() {
@@ -66,19 +89,29 @@ public class User implements Parcelable {
 		dest.writeString(Password);
 		dest.writeInt(Rights);
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		if(Avatar != null)Avatar.compress(Bitmap.CompressFormat.JPEG, 85, baos);
-		dest.writeInt(baos.toByteArray().length);
-		dest.writeByteArray(baos.toByteArray());
+		if(Avatar != null){
+			Avatar.compress(Bitmap.CompressFormat.JPEG, 85, baos);
+			dest.writeInt(baos.toByteArray().length);
+			dest.writeByteArray(baos.toByteArray());
+		}else{
+			dest.writeInt(-1);
+		}
 		
 	}
 	
-	public void readFromParcel(Parcel source){
-		ID = source.readInt();
-		Name = source.readString();
-		Password = source.readString();
-		Rights = source.readInt();
-		byte[] bytes = new byte[source.readInt()];
-		source.readByteArray(bytes);
-		Avatar = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+	public void readFromParcel(Parcel in){
+		ID = in.readInt();
+		Name = in.readString();
+		Password = in.readString();
+		Rights = in.readInt();
+		int length = in.readInt();
+		if(length >= 0){
+			byte[] bytes = new byte[length];
+			in.readByteArray(bytes);
+			Avatar = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+		}else{
+			Avatar = null;
+		}
 	}
+	
 }
