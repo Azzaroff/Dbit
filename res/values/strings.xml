@@ -54,4 +54,10 @@
 	<string name="no_age">Please insert age.</string>
 	<string name="no_loc_support">Your device does not support location information in pictures.</string>
 	<string name="db_error">An database error occured.</string>
+	
+	<string name="comment_list_avatar">user avatar</string>
+	<string name="empty_comment">No comment was written.</string>
+	
+	<string name="latitude">lat.</string>
+	<string name="longitude">long.</string>
 </resources>

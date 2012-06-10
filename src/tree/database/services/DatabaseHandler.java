@@ -12,12 +12,12 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import tree.database.updateChecker;
+import tree.database.data.Comment;
 import tree.database.data.Group;
 import tree.database.data.Tree;
 import tree.database.data.User;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.location.Location;
 import android.util.Log;
 
 public class DatabaseHandler{
@@ -25,7 +25,55 @@ public class DatabaseHandler{
 	private Connection connection;
 	private static String URL = "jdbc:postgresql://seclab10.medien.uni-weimar.de/baumdb?user=worker&password=mindless&ssl=true&sslfactory=org.postgresql.ssl.NonValidatingFactory";
 	
-	public ArrayList<Tree> getTreeList(Location loc, double radius){
+	public ArrayList<Tree> getTreeList(float[] userlocation, double radius, User user){
+		ResultSet rs;
+		
+    	try {
+    		Log.i("postgres","Go Postgres!");
+			Class.forName("org.postgresql.Driver");
+			Connection conn = DriverManager.getConnection(URL);
+			
+			PreparedStatement ps = conn.prepareStatement("SELECT uid, long, lat, date, size, age, name FROM trees WHERE (uid = ?);");
+			ps.setInt(1, user.ID);
+			rs = ps.executeQuery();
+		
+			Log.i(this.getClass().getSimpleName(), ps.toString());
+			
+			ArrayList<Tree> treelist = new ArrayList<Tree>();
+			
+		    while(rs.next()){
+		    	float[] location = {rs.getFloat(3), rs.getFloat(2)};
+		    	Tree t = new Tree(rs.getInt(1), rs.getString(7), rs.getInt(6), rs.getDouble(5), location, rs.getDate(4));
+		    	treelist.add(t);
+    		}
+			rs.close();
+			ps.close();
+			//get pictures if the rights are enought
+			if(user.Rights >= User.SHOW_PICTURES){
+				for(int i = 0; i < treelist.size(); ++i){
+					ps = conn.prepareStatement("SELECT image FROM images WHERE (tid = ?);");
+					ps.setInt(1, treelist.get(i).ID);
+					rs = ps.executeQuery();
+					ArrayList<Bitmap> images = new ArrayList<Bitmap>();
+					while(rs.next()){
+						byte[] bytes = rs.getBytes(1);
+						images.add(BitmapFactory.decodeByteArray(bytes, 0, bytes.length));
+					}
+					treelist.get(i).Images = images;
+					rs.close();
+					ps.close();
+				}
+			}			
+			//check, if the statement changes DB entries
+			conn.close();
+			return treelist;
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+    	Log.i(this.getClass().getSimpleName(), user.toString());
+		
 		return new ArrayList<Tree>();
 	}
 	
@@ -40,7 +88,7 @@ public class DatabaseHandler{
 			
 			PreparedStatement ps = conn.prepareStatement("INSERT INTO trees (long, lat, date, uid, size, age, name) VALUES (?, ?, ?, ?, ?, ?, ?);");
 			ps.setDouble(1, loc[1]);
-			ps.setDouble(2, loc[2]);
+			ps.setDouble(2, loc[0]);
 			Date d = new Date();
 			ps.setDate(3, (java.sql.Date) d);
 			ps.setInt(4, uid);
@@ -196,6 +244,14 @@ public class DatabaseHandler{
 			e.printStackTrace();
 		}
     	return false;
+	}
+	
+	public boolean addComment(int uid, int tid, Comment comment){
+		return true;
+	}
+	
+	public ArrayList<Comment> getCommentList(int tid){
+		return new ArrayList<Comment>();
 	}
 	
 	private void processQuery(String statement){
