@@ -17,7 +17,6 @@
             </intent-filter>
         </activity>
         
-        <activity android:label="logon" android:name=".LogOnActivity"> </activity>
         <activity android:label="createuser" android:name=".CreateUserActivity"> </activity>
         <activity android:label="mainactivity" android:name=".MainActivity"> </activity>
         
