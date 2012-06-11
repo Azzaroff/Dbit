@@ -45,6 +45,14 @@ public class LogOnActivity extends Activity{
 			@Override
 			public void onClick(View v) {
 				if(user == null) user = dbhandle.getUser(name.getText().toString());
+				//db error
+				if(user == null){
+					Toast toast = Toast.makeText(getApplicationContext(), R.string.logonUserFailure, Toast.LENGTH_LONG);
+					toast.show();
+					pwd.setText("");
+					name.setText("");
+					return;
+				}
 				//test the password
 				if(user.testPassword(pwd.getText().toString())){
 					Intent intent = new Intent(LogOnActivity.this, MainActivity.class);

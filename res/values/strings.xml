@@ -32,6 +32,7 @@
     <string name="pwdLabel">Password</string>
     <string name="logonLabel">Logon</string>
     <string name="logonPasswordFailure">Password failure. Please try again.</string>
+    <string name="logonUserFailure">Username failure. Not the right name?</string>
     <string name="createUserLabel">create new User</string>
     <string name="createUserButtonText">create</string>
     <string name="nameFailure">Please fill in your name.</string>

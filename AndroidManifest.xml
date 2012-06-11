@@ -42,6 +42,8 @@
         <activity android:label="allbrowse" android:name=".AllTabActivity"> </activity>
         
         <activity android:name="tree.database.Preferences"></activity>
+        
+        <activity android:name="tree.database.debugActivity"></activity>
 
         
         

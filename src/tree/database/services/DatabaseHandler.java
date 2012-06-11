@@ -159,6 +159,7 @@ public class DatabaseHandler{
 		ResultSet rs;
 		
 		User user = new User();
+		int count = 0;
     	
     	try {
     		Log.i("postgres","Go Postgres!");
@@ -172,12 +173,15 @@ public class DatabaseHandler{
 		
 			Log.i(this.getClass().getSimpleName(), ps.toString());
 			
-		    rs.next();
-		    user.ID = rs.getInt(1);
-		    user.Name = rs.getString(2);
-		    user.Password = rs.getString(3);
-		    user.Rights = rs.getInt(4);
-		    
+			while(rs.next()){
+				count++;
+			    user.ID = rs.getInt(1);
+			    user.Name = rs.getString(2);
+			    user.Password = rs.getString(3);
+			    user.Rights = rs.getInt(4);
+
+			}
+			
 			rs.close();
 			ps.close();
 			//check, if the statement changes DB entries
@@ -188,6 +192,10 @@ public class DatabaseHandler{
 			e.printStackTrace();
 		}
     	Log.i(this.getClass().getSimpleName(), user.toString());
+    	if(count == 0){
+    		Log.e(this.getClass().getSimpleName(), "no User in DB found with this name");
+    		user = null;
+    	}
     	return user;
 	}
 	
@@ -251,6 +259,7 @@ public class DatabaseHandler{
 	}
 	
 	public ArrayList<Comment> getCommentList(int tid){
+		System.out.println("commentlist");
 		return new ArrayList<Comment>();
 	}
 	

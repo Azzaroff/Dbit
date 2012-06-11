@@ -22,11 +22,14 @@ public class LazyAdapter extends BaseAdapter {
     public LazyAdapter(Activity a, ArrayList<Comment> comments) {
         this.activity = a;
         this.comments = comments;
+        System.out.println("klappt");
         this.inflater = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        System.out.println("klappt nicht");
         
         if(comments.size() <= 0){
         	Comment c = new Comment();
         	c.Content = (String) activity.getText(R.string.empty_comment);
+        	comments.add(c);
         }
     }
 

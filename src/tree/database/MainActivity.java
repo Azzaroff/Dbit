@@ -49,7 +49,7 @@ public class MainActivity extends TabActivity{
 //	    tabHost.addTab(spec);
 	    
 	    
-	    tabHost.getTabWidget().setDividerDrawable(R.drawable.tab_divider);	    
+	    tabHost.getTabWidget().setDividerDrawable(R.drawable.tab_divider);	
 	    setupTab(new TextView(this), (String)getText(R.string.browseTabText), new Intent(this, MainTabGroup1Activity.class), extras);
 	    setupTab(new TextView(this), (String)getText(R.string.createTabText), new Intent(this, MainTabGroup2Activity.class), extras);
 	    setupTab(new TextView(this), (String)getText(R.string.settingsTabText), new Intent(this, MainTabGroup3Activity.class), extras);
@@ -74,8 +74,8 @@ public class MainActivity extends TabActivity{
 	 private void setupTab(final View view, final String tag, Intent content, Bundle extras) {
 		content.putExtras(extras);
  	    View tabview = createTabView(tabHost.getContext(), tag);
- 	        TabSpec setContent = tabHost.newTabSpec(tag).setIndicator(tabview).setContent(content);
- 	    tabHost.addTab(setContent);
+ 	    TabSpec setContent = tabHost.newTabSpec(tag).setIndicator(tabview).setContent(content);
+ 	    tabHost.addTab(setContent); //hier gibts probleme
 	 	}
  	 
  	private static View createTabView(final Context context, final String text) {

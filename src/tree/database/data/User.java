@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 public class User implements Parcelable {
 	
@@ -41,6 +42,7 @@ public class User implements Parcelable {
 	}
 	
 	public boolean testPassword(String Password){
+		Log.i(this.getClass().getSimpleName(), "test password");
 		return this.Password.equals(sha256(Password));
 	}
 	

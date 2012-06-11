@@ -26,6 +26,7 @@ public class BrowseTabGroup2Activity extends ActivityGroup{
         
         Intent intent = new Intent(this, BrowseTabActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.putExtras(getIntent().getExtras());
+        intent.putExtra("Tab", ""+2);
         View view = getLocalActivityManager().startActivity("Recent", intent).getDecorView();
         
         setContentView(view);
