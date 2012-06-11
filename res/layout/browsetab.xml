@@ -10,24 +10,18 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content">
         
-     <!-- <GridView 
+     <GridView 
     	android:id="@+id/gridview"
     	android:layout_width="fill_parent"
     	android:layout_height="wrap_content"
-    	android:padding="5dp"
-	    android:verticalSpacing="5dp"
-	    android:horizontalSpacing="20dp"
-	    android:numColumns="auto_fit"
-	    android:columnWidth="60dp"
-	    android:stretchMode="columnWidth"
 	    android:gravity="center_horizontal"
-    	android:layout_weight="1"/> -->
+    	android:layout_weight="1"/>
     	
-    	<Gallery xmlns:android="http://schemas.android.com/apk/res/android" 
+    	<!-- <Gallery xmlns:android="http://schemas.android.com/apk/res/android" 
     	android:id="@+id/gallery"
     	android:layout_width="fill_parent"
     	android:layout_height="wrap_content"
-    	android:layout_weight="1"/>
+    	android:layout_weight="1"/> -->
      
      <LinearLayout
         android:layout_width="fill_parent"

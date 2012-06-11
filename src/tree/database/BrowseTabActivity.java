@@ -23,6 +23,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.Gallery;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -34,7 +35,7 @@ public class BrowseTabActivity extends Activity{
 	private static final int RECENTTAB = 1;
 	private static final int ALLTAB = 2;	
 	
-	private Gallery gallery;
+	private GridView gallery;
 	
 	private TextView nameText;
 	private TextView longitudeText;
@@ -66,18 +67,15 @@ public class BrowseTabActivity extends Activity{
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.browsetab); 
-		System.out.println("hier");
 		
 		Bundle extras = getIntent().getExtras();
 		dbhandle = new DatabaseHandler();
 		user = extras.getParcelable("UserData");
 
-	    System.out.println("geht");
-		
 		//gets the current location
 //		updateLocation();
 		
-		gallery = (Gallery) findViewById(R.id.gallery);
+		gallery = (GridView) findViewById(R.id.gridview);
 	    gallery.setAdapter(new ImageAdapter(this, Integer.parseInt(extras.getString("Tab"))));
 
 	    nameText = (TextView)findViewById(R.id.nametext);
@@ -178,11 +176,11 @@ public class BrowseTabActivity extends Activity{
 	    public View getView(int position, View convertView, ViewGroup parent) {
 	        ImageView imageView = new ImageView(mContext);
 
-	        //imageView.setImageResource(mImageIds[position]);
+//	        imageView.setImageResource(mImageIds[position]);
 	        imageView.setImageBitmap(BitmapFactory.decodeFile(imageList[position].getAbsolutePath()));
 	        
 //	        imageView.setImageBitmap(treelist.get(position).Images.get(0));
-	        imageView.setLayoutParams(new Gallery.LayoutParams(150, 100));
+	        imageView.setLayoutParams(new GridView.LayoutParams(150, 100));
 	        imageView.setScaleType(ImageView.ScaleType.FIT_XY);
 	        imageView.setBackgroundResource(mGalleryItemBackground);
 

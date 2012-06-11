@@ -35,6 +35,7 @@ public class CreateActivity extends Activity{
 	
 	private static final int CAMERA_PIC_REQUEST = 4711;
 	protected static final String TREE_PATH = "/mnt/sdcard/treeDB/tmp/tree.jpg";
+	protected static final String TMP_PATH = "/mnt/sdcard/treeDB/tmp/";
 	
 	private Bitmap picture;
 	
@@ -160,6 +161,11 @@ public class CreateActivity extends Activity{
 	}
 	
 	private void writePictureToStorage(Bitmap picture){
+		File folder = new File(TMP_PATH);
+		if(!folder.exists()){
+			folder.mkdir();
+			Log.i(this.getClass().getSimpleName(), "create Folder "+TMP_PATH);
+		}
 		File file = new File(TREE_PATH);
     	try {
 			file.createNewFile();
