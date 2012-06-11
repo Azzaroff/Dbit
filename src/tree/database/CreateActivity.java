@@ -114,6 +114,8 @@ public class CreateActivity extends Activity{
 					if(!dbhandle.addTree(user.ID, picture, nameText.getText().toString(), location, Double.parseDouble(sizeText.getText().toString()), Integer.parseInt(ageText.getText().toString()))){
 						Toast toast = Toast.makeText(getParent(), getText(R.string.db_error), Toast.LENGTH_LONG);
 						toast.show();
+					}else{
+						finish();
 					}
 				} catch (IOException e) {
 					// TODO Auto-generated catch block

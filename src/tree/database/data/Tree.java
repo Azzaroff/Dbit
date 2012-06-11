@@ -14,12 +14,22 @@ public class Tree {
 	/**
 	 * [lat, long]
 	 */
-	public float[] Location = new float[2];
+	public Double[] Location = new Double[2];
 	public ArrayList<Comment> Comments;
 	public long Date;
 	public ArrayList<Bitmap> Images;
 	
-	public Tree(int ID, String Name, int Age, double Size, float[] Location, Date Date){
+	public Tree(){
+		this.ID = -1;
+		this.Name = "Fnord";
+		this.Age = -1;
+		this.Size = -1;
+		this.Date = 0;
+		this.Location[0] = Double.MAX_VALUE;
+		this.Location[1] = Double.MAX_VALUE;;
+	}
+	
+	public Tree(int ID, String Name, int Age, double Size, Double[] Location, Date Date){
 		this.ID = ID;
 		this.Name = Name;
 		this.Age = Age;
@@ -27,5 +37,10 @@ public class Tree {
 		this.Date = Date.getTime();
 		this.Location[0] = Location[0];
 		this.Location[1] = Location[1];
+	}
+	
+	public String toString(){
+		return "ID: "+ID+" Name: "+Name+" Age: "+Age+" Size: "+Size+
+				" Date: "+Date+" Lat: "+Location[0]+" Long: "+Location[1];
 	}
 }

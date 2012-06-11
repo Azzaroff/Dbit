@@ -9,6 +9,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Currency;
 import java.util.Date;
 
 import tree.database.updateChecker;
@@ -41,7 +42,7 @@ public class DatabaseHandler{
 			ArrayList<Tree> treelist = new ArrayList<Tree>();
 			
 		    while(rs.next()){
-		    	float[] location = {rs.getFloat(3), rs.getFloat(2)};
+		    	Double[] location = {rs.getDouble(3), rs.getDouble(2)};
 		    	Tree t = new Tree(rs.getInt(1), rs.getString(7), rs.getInt(6), rs.getDouble(5), location, rs.getDate(4));
 		    	treelist.add(t);
     		}
@@ -77,7 +78,9 @@ public class DatabaseHandler{
 	}
 	
 	public boolean addTree(int uid, Bitmap image, String name, float[] loc, double size, int age){
+		boolean success = false;
 		try {
+			int tid = 0;
     		Log.i("postgres","Go Postgres!");
 			Class.forName("org.postgresql.Driver");
 			Connection conn = DriverManager.getConnection(URL);
@@ -85,17 +88,87 @@ public class DatabaseHandler{
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			image.compress(Bitmap.CompressFormat.JPEG, 85, baos);
 			
-			PreparedStatement ps = conn.prepareStatement("INSERT INTO trees (long, lat, date, uid, size, age, name) VALUES (?, ?, ?, ?, ?, ?, ?);");
-			ps.setDouble(1, loc[1]);
-			ps.setDouble(2, loc[0]);
+			PreparedStatement ps = conn.prepareStatement("INSERT INTO trees (long, lat, date, size, age, name) VALUES (?, ?, ?, ?, ?, ?) RETURNING tid;");
+			if(loc != null){
+				ps.setDouble(1, loc[1]);
+				ps.setDouble(2, loc[0]);
+			}
+			else{
+				ps.setDouble(1, Double.MAX_VALUE);
+				ps.setDouble(2, Double.MAX_VALUE);
+			}
 			Date d = new Date();
-			ps.setDate(3, (java.sql.Date) d);
-			ps.setInt(4, uid);
-			ps.setDouble(5, size);
-			ps.setInt(6, age);
-			ps.setString(7, name);
+			ps.setDate(3, new java.sql.Date(d.getTime()));
+			ps.setDouble(4, size);
+			ps.setInt(5, age);
+			ps.setString(6, name);
+			
+			ResultSet rs = ps.executeQuery();
+			if(rs.next()){
+			      tid = rs.getInt(1);
+			      success = true;
+			}
+			ps.close();
+			
+			int pid = addTreeImage(image, tid, conn, new java.sql.Date(d.getTime()));
+			addTreeImageRelation(pid, tid, conn);
+			addUserImageRelation(uid,pid,conn);
+			
+			conn.close();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+    	return success;
+	}
+	
+	public boolean updateTree(Tree tree){
+		return true;
+	}
+	
+	private int addTreeImage(Bitmap image, int treeID, Connection conn, java.sql.Date date){
+		int pid = 0;
+		try {
+    		Log.i("postgres","Go Postgres!");
+			Class.forName("org.postgresql.Driver");
+			
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			image.compress(Bitmap.CompressFormat.JPEG, 85, baos);
+			
+			PreparedStatement ps = conn.prepareStatement("INSERT INTO images (date, img) VALUES (?, ?) RETURNING pid;");
+			ps.setDate(1, date);
+			ps.setBytes(2, baos.toByteArray());
+			
+			ResultSet rs = ps.executeQuery();
+			if(rs.next()){
+			      pid = rs.getInt(1);
+			}
+			
+			ps.close();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		Log.i(this.getClass().getSimpleName(), "Add TreeImage pid:"+pid);
+		
+		return pid;
+	}
+	
+	private boolean addTreeImageRelation(int pid, int tid, Connection conn){
+		try {
+    		Log.i("postgres","Go Postgres!");
+			Class.forName("org.postgresql.Driver");
+			
+			
+			PreparedStatement ps = conn.prepareStatement("INSERT INTO tree_has_picture (pid, tid) VALUES (?, ?);");
+			ps.setInt(1, pid);
+			ps.setInt(2, tid);
 			
 			if(ps.executeUpdate() >= 1){
+				Log.i(this.getClass().getSimpleName(), "Add TreeImageRelation pid:"+ pid + " tid:"+tid);
 				return true;
 			}
 			ps.close();
@@ -104,12 +177,34 @@ public class DatabaseHandler{
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		Log.i(this.getClass().getSimpleName(), "Add TreeImageRelation pid:"+ pid + " tid:"+tid);
 		
-    	return false;
+		return false;
 	}
 	
-	public boolean updateTree(Tree tree){
-		return true;
+	private boolean addUserImageRelation(int uid, int pid, Connection conn){
+		try {
+    		Log.i("postgres","Go Postgres!");
+			Class.forName("org.postgresql.Driver");
+			
+			
+			PreparedStatement ps = conn.prepareStatement("INSERT INTO user_took_picture (uid, pid) VALUES (?, ?);");
+			ps.setInt(1, uid);
+			ps.setInt(2, pid);
+			
+			if(ps.executeUpdate() >= 1){
+				Log.i(this.getClass().getSimpleName(), "Add UserImageRelation pid:"+ pid + " uid:"+uid);
+				return true;
+			}
+			ps.close();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		Log.i(this.getClass().getSimpleName(), "Add UserImageRelation pid:"+ pid + " uid:"+uid);
+		
+		return false;
 	}
 	
 	public ArrayList<Group> getGroupList(){
@@ -196,6 +291,89 @@ public class DatabaseHandler{
     		user = null;
     	}
     	return user;
+	}
+	
+	public Tree getTree(java.sql.Date date, String name){
+		ResultSet rs;
+		
+		Tree tree = new Tree();
+		int count = 0;
+    	
+    	try {
+    		Log.i("postgres","getTree");
+			Class.forName("org.postgresql.Driver");
+			Connection conn = DriverManager.getConnection(URL);
+			
+			PreparedStatement ps = conn.prepareStatement("SELECT tid, long, lat, date, size, age, name FROM trees WHERE (name = ? and date = ?);");
+			ps.setString(1, name);
+			ps.setDate(2, date);
+			rs = ps.executeQuery();
+		
+			Log.i(this.getClass().getSimpleName(), ps.toString());
+			
+			while(rs.next()){
+				count++;
+				tree.ID = rs.getInt(1);
+				tree.Location[1] = rs.getDouble(2);
+				tree.Location[0] = rs.getDouble(3);
+				tree.Date = rs.getDate(4).getTime();
+				tree.Size = rs.getInt(5);
+				tree.Age = rs.getInt(6);
+				tree.Name = rs.getString(7);
+			}
+			
+			rs.close();
+			ps.close();
+			//check, if the statement changes DB entries
+			conn.close();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+    	Log.i(this.getClass().getSimpleName(), tree.toString());
+    	if(count == 0){
+    		Log.e(this.getClass().getSimpleName(), "no Tree in DB found with this name and date");
+    		tree = null;
+    	}
+    	return tree;
+	}
+	
+	//nur nach insert aufrufen!
+	public int getCurrval(String seqname, Connection conn){
+		ResultSet rs;
+		
+		int currval = 0;
+		int count = 0;
+    	
+    	try {
+    		Log.i("postgres","getTree");
+			Class.forName("org.postgresql.Driver");
+			
+			PreparedStatement ps = conn.prepareStatement("SELECT currval(?);");
+			ps.setString(1, seqname);
+			rs = ps.executeQuery();
+		
+			Log.i(this.getClass().getSimpleName(), ps.toString());
+			
+			while(rs.next()){
+				count++;
+				rs.getInt(1);
+			}
+			
+		    rs.close();
+			ps.close();
+			//check, if the statement changes DB entries
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+    	Log.i(this.getClass().getSimpleName(), "Currval:" + currval);
+    	if(count == 0){
+    		Log.e(this.getClass().getSimpleName(), "Currval error, vllt insert vergessen?");
+    	}
+		return currval;
 	}
 	
 	public User getUserPicture(User user){
