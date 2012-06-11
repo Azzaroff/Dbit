@@ -71,12 +71,10 @@ public class User implements Parcelable {
 	}
 	
 	public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
-        @Override
 		public User createFromParcel(Parcel in) {
             return new User(in);
         }
 
-		@Override
 		public User[] newArray(int size) {
 			// TODO Auto-generated method stub
 			return new User[size];
@@ -84,13 +82,11 @@ public class User implements Parcelable {
  
     };
 
-	@Override
 	public int describeContents() {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
-	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeInt(ID);
 		dest.writeString(Name);

@@ -59,7 +59,6 @@ public class CreateUserActivity extends Activity{
 		
 		//implement the buttons
 		photoButton.setOnClickListener(new OnClickListener() {
-			@Override
 			public void onClick(View v) {
 				Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
 				startActivityForResult(cameraIntent, CAMERA_PIC_REQUEST);  
@@ -67,7 +66,6 @@ public class CreateUserActivity extends Activity{
 		});
 		
 		createButton.setOnClickListener(new OnClickListener() {
-			@Override
 			public void onClick(View v) {
 				//test, if all fields were filled
 				

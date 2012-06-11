@@ -79,13 +79,11 @@ public class LRU extends Buffer{
 		}		
 	}
 
-	@Override
 	public int describeContents() {
 		return 0;
 	}
 
 	@SuppressWarnings("unchecked")
-	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeInt(size);
 		dest.writeInt(bufferTypeID);

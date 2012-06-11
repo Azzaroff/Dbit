@@ -55,7 +55,6 @@ public class SettingsActivity extends Activity{
 		//button events
 		changeButton.setOnClickListener(new OnClickListener() {
 			
-			@Override
 			public void onClick(View v) {
 				showDialog();
 			}
@@ -82,7 +81,6 @@ public class SettingsActivity extends Activity{
 		Button cancelButton = (Button) dialog.findViewById(R.id.change_cancel_button);
 		// if button is clicked, close the custom dialog
 		okButton.setOnClickListener(new OnClickListener() {
-			@Override
 			public void onClick(View v) {
 				if(user.testPassword(old_pwd.getText().toString())){
 					if(new_pwd.getText().toString().equals(rep_new_pwd.getText().toString())){
@@ -102,7 +100,6 @@ public class SettingsActivity extends Activity{
 		});
 		
 		cancelButton.setOnClickListener(new OnClickListener() {
-			@Override
 			public void onClick(View v) {
 				old_pwd.setText("");
 				new_pwd.setText("");

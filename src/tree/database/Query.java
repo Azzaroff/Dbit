@@ -53,12 +53,10 @@ public class Query implements Parcelable{
 		return query_duration;
 	}
 
-	@Override
 	public int describeContents() {
 		return 0;
 	}
 
-	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeString(query);
 		dest.writeString(result);

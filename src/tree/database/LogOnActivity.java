@@ -42,7 +42,6 @@ public class LogOnActivity extends Activity{
 		//button implementation
 		logonButton.setOnClickListener(new OnClickListener(){
 			
-			@Override
 			public void onClick(View v) {
 				if(user == null) user = dbhandle.getUser(name.getText().toString());
 				//db error
@@ -68,7 +67,6 @@ public class LogOnActivity extends Activity{
 		
 		createUserButton.setOnClickListener(new OnClickListener(){
 			
-			@Override
 			public void onClick(View v) {
 				Intent intent = new Intent(LogOnActivity.this, CreateUserActivity.class);
 				startActivity(intent);
@@ -77,7 +75,6 @@ public class LogOnActivity extends Activity{
 		
 		pwd.setOnKeyListener(new OnKeyListener() {
 			
-			@Override
 			public boolean onKey(View v, int keyCode, KeyEvent event) {
 				if(keyCode == 66) logonButton.performClick();
 				return false;

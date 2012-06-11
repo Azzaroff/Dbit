@@ -73,20 +73,17 @@ public class LFU extends Buffer{
 		}		
 	}
 
-	@Override
 	public int describeContents() {
 		return 0;
 	}
 
 	@SuppressWarnings("unchecked")
-	@Override
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeInt(size);
 		dest.writeInt(bufferTypeID);
 		dest.writeList((List<Query>)data);		
 	}
 
-	@Override
 	public int getNumberofElements() {
 		return data.size();
 	}

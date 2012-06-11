@@ -102,7 +102,6 @@ public class BrowseTabActivity extends Activity{
 	    
 	    //gallery on click
 	    gallery.setOnItemClickListener(new OnItemClickListener() {
-	    	@Override
 	        public void onItemClick(AdapterView parent, View v, int position, long id) {
 	            Toast.makeText(BrowseTabActivity.this, "" + position, Toast.LENGTH_SHORT).show();
 	            
@@ -128,7 +127,6 @@ public class BrowseTabActivity extends Activity{
 	    
 	    gallery.setOnLongClickListener(new OnLongClickListener() {
 			
-			@Override
 			public boolean onLongClick(View v) {
 				Toast toast = Toast.makeText(getParent(), "long click - do something useful here", Toast.LENGTH_LONG);
 				toast.show();

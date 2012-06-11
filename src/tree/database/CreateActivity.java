@@ -69,14 +69,12 @@ public class CreateActivity extends Activity{
 		createButton = (Button) findViewById(R.id.createButton);
 		
 		takePictureButton.setOnClickListener(new View.OnClickListener() {
-			@Override
 			public void onClick(View v) {
 				takePicture();
 			}
 		});
 		
 		createButton.setOnClickListener(new View.OnClickListener() {
-			@Override
 			public void onClick(View v) {
 				//teste, ob alles ausgefüllt wurde
 				float[] location = new float[2];
