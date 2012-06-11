@@ -1,6 +1,7 @@
 *.class
 *.apk
 *.dex
+.classpath
 bin/resources.ap_
 ./bin/*
 ./gen/*
