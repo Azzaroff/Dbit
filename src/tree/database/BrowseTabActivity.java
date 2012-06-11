@@ -13,6 +13,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.BitmapFactory;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -35,7 +38,7 @@ public class BrowseTabActivity extends Activity{
 	private static final int RECENTTAB = 1;
 	private static final int ALLTAB = 2;	
 	
-	private GridView gallery;
+	private Gallery gallery;
 	
 	private TextView nameText;
 	private TextView longitudeText;
@@ -58,9 +61,9 @@ public class BrowseTabActivity extends Activity{
 	User user;
 	
 	//GPS Location Manager
-//	private LocationManager locationManager;
-//	private GeoUpdateHandler updatehandler = new GeoUpdateHandler(); //handles gps updates
-//	private Location currentLocation;
+	private LocationManager locationManager;
+	private GeoUpdateHandler updatehandler = new GeoUpdateHandler(); //handles gps updates
+	private Location currentLocation;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -73,9 +76,9 @@ public class BrowseTabActivity extends Activity{
 		user = extras.getParcelable("UserData");
 
 		//gets the current location
-//		updateLocation();
+		updateLocation();
 		
-		gallery = (GridView) findViewById(R.id.gridview);
+		gallery = (Gallery) findViewById(R.id.gallery);
 	    gallery.setAdapter(new ImageAdapter(this, Integer.parseInt(extras.getString("Tab"))));
 
 	    nameText = (TextView)findViewById(R.id.nametext);
@@ -156,8 +159,10 @@ public class BrowseTabActivity extends Activity{
 	        
 	        //get trees from DB
 	        float[] location = new float[2];
-//	        location[0] = (float)currentLocation.getLatitude();
-//	        location[1] = (float)currentLocation.getLongitude();
+	        if(currentLocation != null){
+	        	location[0] = (float)currentLocation.getLatitude();
+	        	location[1] = (float)currentLocation.getLongitude();
+	        }
 	        treelist = dbhandle.getTreeList(location, 15, user);
 	    }
 
@@ -180,7 +185,7 @@ public class BrowseTabActivity extends Activity{
 	        imageView.setImageBitmap(BitmapFactory.decodeFile(imageList[position].getAbsolutePath()));
 	        
 //	        imageView.setImageBitmap(treelist.get(position).Images.get(0));
-	        imageView.setLayoutParams(new GridView.LayoutParams(150, 100));
+	        imageView.setLayoutParams(new Gallery.LayoutParams(150, 100));
 	        imageView.setScaleType(ImageView.ScaleType.FIT_XY);
 	        imageView.setBackgroundResource(mGalleryItemBackground);
 
@@ -188,47 +193,44 @@ public class BrowseTabActivity extends Activity{
 	    }
 	}
 	
-//	/**
-//     * sets the map to the current location
-//     */
-//    private void updateLocation(){
-//    	
-//    	boolean gps_enabled = false;
-//    	boolean network_enabled = false;
-//
-//    	locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-//    	
-//    	try{gps_enabled=locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);}catch(Exception ex){}
-//        try{network_enabled=locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);}catch(Exception ex){}
-//    	
-//        if(gps_enabled)
-//        	locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, updatehandler);
-//        	currentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-//        if(network_enabled)
-//        	locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, updatehandler);
-//        	currentLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-//        
-//    }
-//	
-//	public class GeoUpdateHandler implements LocationListener {
-//
-//		@Override
-//		public void onLocationChanged(Location location) {
-//			int lat = (int) (location.getLatitude() * 1E6);
-//			int lng = (int) (location.getLongitude() * 1E6);
-//			currentLocation = location;
-//		}
-//
-//		@Override
-//		public void onProviderDisabled(String provider) {
-//		}
-//
-//		@Override
-//		public void onProviderEnabled(String provider) {
-//		}
-//
-//		@Override
-//		public void onStatusChanged(String provider, int status, Bundle extras) {
-//		}
-//	}
+	/**
+     * sets the map to the current location
+     */
+    private void updateLocation(){
+    	
+    	boolean gps_enabled = false;
+    	boolean network_enabled = false;
+
+    	locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+    	
+    	try{gps_enabled=locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);}catch(Exception ex){}
+        try{network_enabled=locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);}catch(Exception ex){}
+        
+        if(gps_enabled){
+        	locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, updatehandler);
+        	currentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        }
+        if(network_enabled){
+        	locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, updatehandler);
+        	currentLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        }
+    }
+	
+	public class GeoUpdateHandler implements LocationListener {
+
+		public void onLocationChanged(Location location) {
+			int lat = (int) (location.getLatitude() * 1E6);
+			int lng = (int) (location.getLongitude() * 1E6);
+			currentLocation = location;
+		}
+
+		public void onProviderDisabled(String provider) {
+		}
+
+		public void onProviderEnabled(String provider) {
+		}
+
+		public void onStatusChanged(String provider, int status, Bundle extras) {
+		}
+	}
 }

@@ -33,8 +33,7 @@ public class DatabaseHandler{
 			Class.forName("org.postgresql.Driver");
 			Connection conn = DriverManager.getConnection(URL);
 			
-			PreparedStatement ps = conn.prepareStatement("SELECT uid, long, lat, date, size, age, name FROM trees WHERE (uid = ?);");
-			ps.setInt(1, user.ID);
+			PreparedStatement ps = conn.prepareStatement("SELECT tid, long, lat, date, size, age, name FROM trees;");
 			rs = ps.executeQuery();
 		
 			Log.i(this.getClass().getSimpleName(), ps.toString());
