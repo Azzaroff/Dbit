@@ -26,10 +26,11 @@ public class Tree {
 		this.Size = -1;
 		this.Date = 0;
 		this.Location[0] = Double.MAX_VALUE;
-		this.Location[1] = Double.MAX_VALUE;;
+		this.Location[1] = Double.MAX_VALUE;
+		this.Images = new ArrayList<Bitmap>();
 	}
 	
-	public Tree(int ID, String Name, int Age, double Size, Double[] Location, Date Date){
+	public Tree(int ID, String Name, int Age, double Size, Double[] Location, java.sql.Timestamp Date){
 		this.ID = ID;
 		this.Name = Name;
 		this.Age = Age;
@@ -37,6 +38,7 @@ public class Tree {
 		this.Date = Date.getTime();
 		this.Location[0] = Location[0];
 		this.Location[1] = Location[1];
+		this.Images = new ArrayList<Bitmap>();
 	}
 	
 	public String toString(){

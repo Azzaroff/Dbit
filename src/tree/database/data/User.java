@@ -25,6 +25,13 @@ public class User implements Parcelable {
 	
 	public User(){};
 	
+	//minimal c#tor for comment list
+	public User(int ID, String Name, Bitmap Avatar){
+		this.ID = ID;
+		this.Name = Name;
+		this.Avatar = Avatar;
+	}
+	
 	public User(String Name, String Password, int Rights, Bitmap Avatar){
 		this.Name = Name;
 		this.Password = sha256(Password);

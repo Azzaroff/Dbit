@@ -8,7 +8,12 @@ public class Comment {
 	
 	public Comment(){
 		Date = 0;
-		User = new User();
+		this.User = new User();
 		User.ID = -1;
+	}
+	public Comment(User User, long Date, String Content){
+		this.User= User;
+		this.Date = Date;
+		this.Content = Content;
 	}
 }

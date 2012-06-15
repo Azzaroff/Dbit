@@ -5,14 +5,12 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Currency;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 
-import tree.database.updateChecker;
 import tree.database.data.Comment;
 import tree.database.data.Group;
 import tree.database.data.Tree;
@@ -36,37 +34,38 @@ public class DatabaseHandler{
 			
 			PreparedStatement ps = conn.prepareStatement("SELECT tid, long, lat, date, size, age, name FROM trees;");
 			rs = ps.executeQuery();
+			
+//			select trees.tid, image_result.img FROM trees INNER JOIN (select tree_has_picture.tid, images.img from tree_has_picture inner join images on tree_has_picture.pid = images.pid) AS image_result ON trees.tid = image_result.tid;
 		
 			Log.i(this.getClass().getSimpleName(), ps.toString());
 			
-			ArrayList<Tree> treelist = new ArrayList<Tree>();
-			
+			HashMap<Integer, Tree> tempmap = new HashMap<Integer, Tree>();
+			int count = 0;
 		    while(rs.next()){
 		    	Double[] location = {rs.getDouble(3), rs.getDouble(2)};
-		    	Tree t = new Tree(rs.getInt(1), rs.getString(7), rs.getInt(6), rs.getDouble(5), location, rs.getDate(4));
-		    	treelist.add(t);
+		    	Tree t = new Tree(rs.getInt(1), rs.getString(7), rs.getInt(6), rs.getDouble(5), location, rs.getTimestamp(4));
+		    	tempmap.put(t.ID, t);
+		    	++count;
     		}
+		    Log.i(this.getClass().getSimpleName(), "Number of trees in DB: "+(count-1));
 			rs.close();
 			ps.close();
 			//get pictures if the rights are enought
 			if(user.Rights >= User.SHOW_PICTURES){
-				for(int i = 0; i < treelist.size(); ++i){
-					ps = conn.prepareStatement("SELECT image FROM images WHERE (tid = ?);");
-					ps.setInt(1, treelist.get(i).ID);
-					rs = ps.executeQuery();
-					ArrayList<Bitmap> images = new ArrayList<Bitmap>();
-					while(rs.next()){
-						byte[] bytes = rs.getBytes(1);
-						images.add(BitmapFactory.decodeByteArray(bytes, 0, bytes.length));
-					}
-					treelist.get(i).Images = images;
-					rs.close();
-					ps.close();
+				Log.i(this.getClass().getSimpleName(), "get pictures from database");
+				ps = conn.prepareStatement("SELECT tree_has_picture.tid, images.img FROM tree_has_picture INNER JOIN images ON tree_has_picture.pid = images.pid;");
+				rs = ps.executeQuery();
+				Log.i(this.getClass().getSimpleName(), ps.toString());
+				while(rs.next()){
+					byte[] bytes = rs.getBytes(2);
+					tempmap.get(rs.getInt(1)).Images.add(BitmapFactory.decodeByteArray(bytes, 0, bytes.length));
 				}
+				rs.close();
+				ps.close();
 			}			
 			//check, if the statement changes DB entries
 			conn.close();
-			return treelist;
+			return new ArrayList<Tree>(tempmap.values());
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (SQLException e) {
@@ -98,7 +97,7 @@ public class DatabaseHandler{
 				ps.setDouble(2, Double.MAX_VALUE);
 			}
 			Date d = new Date();
-			ps.setDate(3, new java.sql.Date(d.getTime()));
+			ps.setTimestamp(3, new java.sql.Timestamp(d.getTime()));
 			ps.setDouble(4, size);
 			ps.setInt(5, age);
 			ps.setString(6, name);
@@ -110,7 +109,7 @@ public class DatabaseHandler{
 			}
 			ps.close();
 			
-			int pid = addTreeImage(image, tid, conn, new java.sql.Date(d.getTime()));
+			int pid = addTreeImage(image, tid, conn, new java.sql.Timestamp(d.getTime()));
 			addTreeImageRelation(pid, tid, conn);
 			addUserImageRelation(uid,pid,conn);
 			
@@ -128,7 +127,7 @@ public class DatabaseHandler{
 		return true;
 	}
 	
-	private int addTreeImage(Bitmap image, int treeID, Connection conn, java.sql.Date date){
+	private int addTreeImage(Bitmap image, int treeID, Connection conn, java.sql.Timestamp date){
 		int pid = 0;
 		try {
     		Log.i("postgres","Go Postgres!");
@@ -138,7 +137,7 @@ public class DatabaseHandler{
 			image.compress(Bitmap.CompressFormat.JPEG, 85, baos);
 			
 			PreparedStatement ps = conn.prepareStatement("INSERT INTO images (date, img) VALUES (?, ?) RETURNING pid;");
-			ps.setDate(1, date);
+			ps.setTimestamp(1, date);
 			ps.setBytes(2, baos.toByteArray());
 			
 			ResultSet rs = ps.executeQuery();
@@ -293,7 +292,7 @@ public class DatabaseHandler{
     	return user;
 	}
 	
-	public Tree getTree(java.sql.Date date, String name){
+	public Tree getTree(java.sql.Timestamp date, String name){
 		ResultSet rs;
 		
 		Tree tree = new Tree();
@@ -306,7 +305,7 @@ public class DatabaseHandler{
 			
 			PreparedStatement ps = conn.prepareStatement("SELECT tid, long, lat, date, size, age, name FROM trees WHERE (name = ? and date = ?);");
 			ps.setString(1, name);
-			ps.setDate(2, date);
+			ps.setTimestamp(2, date);
 			rs = ps.executeQuery();
 		
 			Log.i(this.getClass().getSimpleName(), ps.toString());
@@ -316,7 +315,7 @@ public class DatabaseHandler{
 				tree.ID = rs.getInt(1);
 				tree.Location[1] = rs.getDouble(2);
 				tree.Location[0] = rs.getDouble(3);
-				tree.Date = rs.getDate(4).getTime();
+				tree.Date = rs.getTimestamp(4).getTime();
 				tree.Size = rs.getInt(5);
 				tree.Age = rs.getInt(6);
 				tree.Name = rs.getString(7);
@@ -431,52 +430,57 @@ public class DatabaseHandler{
     	return false;
 	}
 	
-	public boolean addComment(int uid, int tid, Comment comment){
-		return true;
-	}
-	
-	public ArrayList<Comment> getCommentList(int tid){
-		System.out.println("commentlist");
-		return new ArrayList<Comment>();
-	}
-	
-	private void processQuery(String statement){
-		ResultSet rs;
-    	
-    	try {
+	public boolean addComment(int tid, Comment comment){
+		try {
     		Log.i("postgres","Go Postgres!");
-			Class.forName("org.postgresql.Driver");
 			Connection conn = DriverManager.getConnection(URL);
 			
-			Statement st = conn.createStatement();
-			//checks if it was an sql statement containing insert into, update or delete
-			updateChecker uc = new updateChecker();
-			if(uc.checkUpdate(statement) != null){
-				st.executeUpdate(statement);
-			}else{				
-				rs = st.executeQuery(statement);
-				ResultSetMetaData rsmd = rs.getMetaData();
+			PreparedStatement ps = conn.prepareStatement("INSERT INTO comments (uid, tid, content, date) VALUES (?, ?, ?, ?);");
+			ps.setInt(1, comment.User.ID);
+			ps.setInt(2, tid);
+			ps.setString(3, comment.Content);
+			ps.setTimestamp(4, new java.sql.Timestamp(comment.Date));
 			
-			    int numCols = rsmd.getColumnCount();
-				
-				while (rs.next()) {
-					Log.i("postgres","getting one column");
-					String row = "";
-				    for (int i = 1; i <= numCols; i++) {
-				    	 row = row + "| " + rs.getString(i);
-					}
-				    row = row + " |";
-				    Log.i("postgres",row);
-				}
-				rs.close();
-				st.close();
-				//check, if the statement changes DB entries
+			if(ps.executeUpdate() >= 1){
+				Log.i(this.getClass().getSimpleName(), "Add Comment");
+				return true;
 			}
-			conn.close();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+			ps.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		
+    	return false;
+	}
+	
+	public ArrayList<Comment> getCommentList(int tid){
+		try {
+    		Log.i("postgres","Go Postgres!");
+			Connection conn = DriverManager.getConnection(URL);
+			
+			PreparedStatement ps = conn.prepareStatement("SELECT u.uid, u.name, u.avatar, c.content, c.date FROM users u NATURAL JOIN comments c WHERE (c.tid = ?);");
+			ps.setInt(1, tid);
+			
+			Log.i(this.getClass().getSimpleName(), ps.toString());
+			
+			ResultSet rs = ps.executeQuery();
+			
+			ArrayList<Comment> commentlist = new ArrayList<Comment>();
+					
+		    while(rs.next()){
+		    	
+		    	User u = new User(rs.getInt(1), rs.getString(2), BitmapFactory.decodeByteArray(rs.getBytes(3), 0, rs.getBytes(3).length));
+		    	commentlist.add(new Comment(u, rs.getTimestamp(5).getTime(), rs.getString(4)));
+		    	Log.i(this.getClass().getSimpleName(), rs.getString(4));
+		    }
+			rs.close();
+			ps.close();
+			//check, if the statement changes DB entries
+			conn.close();
+			return commentlist;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}    	
+		return new ArrayList<Comment>();
 	}
 }

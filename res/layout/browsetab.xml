@@ -1,99 +1,106 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView 
+<RelativeLayout 
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/scroll"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content">
     
-    <LinearLayout android:id="@+id/container"
+    <EditText
+		android:id="@+id/addcomment"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:inputType="text"
+	    android:layout_alignParentBottom="true"/>
+    
+<!--     <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/container"
         android:orientation="vertical"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="fill_parent"> -->
         
-    <!--  <GridView 
-    	android:id="@+id/gridview"
-    	android:layout_width="fill_parent"
-    	android:layout_height="wrap_content"
-	    android:gravity="center_horizontal"
-    	android:layout_weight="1"/> -->
-    	
     	<Gallery xmlns:android="http://schemas.android.com/apk/res/android" 
     	android:id="@+id/gallery"
     	android:layout_width="fill_parent"
     	android:layout_height="wrap_content"
-    	android:layout_weight="1"/>
+    	android:layout_marginTop="5dip"
+    	android:layout_marginBottom="5dip"
+    	android:layout_alignParentTop="true"/>
      
-     <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_weight="4">
-                 
-        <LinearLayout
+		<LinearLayout
 	        android:layout_width="fill_parent"
 	        android:layout_height="wrap_content"
-	        android:orientation="horizontal">
-			<TextView 
-			  	android:layout_width="fill_parent"
-			  	android:layout_height="fill_parent"
-			  	android:text="@string/nameLabel"/>
-			<TextView
-			  	android:id="@+id/nametext"
-			  	android:layout_width="fill_parent"
-			  	android:layout_height="fill_parent"/>
-	    </LinearLayout>
-	    <LinearLayout
-	        android:layout_width="fill_parent"
-	        android:layout_height="wrap_content"
-	        android:orientation="horizontal">
-			<TextView 
-			  	android:layout_width="fill_parent"
-			  	android:layout_height="fill_parent"
-			  	android:text="@string/positionLabel"/>
-			<TextView
-			  	android:id="@+id/lattext"
-			  	android:layout_width="fill_parent"
-			  	android:layout_height="fill_parent"/>
-			<TextView 
-			  	android:id="@+id/longtext"
-			  	android:layout_width="fill_parent"
-			  	android:layout_height="fill_parent"/>
-	    </LinearLayout>
-	    <LinearLayout
-	        android:layout_width="fill_parent"
-	        android:layout_height="wrap_content"
-	        android:orientation="horizontal">
-			<TextView 
-			  	android:layout_width="fill_parent"
-			  	android:layout_height="fill_parent"
-			  	android:text="@string/sizeLabel"
-			  	android:layout_weight="1"/>
-			<TextView
-			  	android:id="@+id/browse_sizetext"
-			  	android:layout_width="fill_parent"
-			  	android:layout_height="fill_parent"
-			  	android:layout_weight="1"/>
-			<TextView 
-			  	android:layout_width="fill_parent"
-			  	android:layout_height="fill_parent"
-			  	android:text="@string/ageLabel"
-			  	android:layout_weight="1"/>
-			<TextView 
-			  	android:id="@+id/browse_agetext"
-			  	android:layout_width="fill_parent"
-			  	android:layout_height="fill_parent"
-			  	android:layout_weight="1"/>
-	    </LinearLayout>         
-        <ListView
-            android:id="@+id/list"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"/>
-		<EditText
-			android:id="@+id/addcomment"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:inputType="text"/>
-     </LinearLayout>
-   </LinearLayout> 
-</ScrollView>
+	        android:orientation="vertical"
+	        android:layout_below="@id/gallery"
+	        android:id="@+id/browse_prop_container">
+	                 
+	        <LinearLayout
+		        android:layout_width="fill_parent"
+		        android:layout_height="wrap_content"
+		        android:orientation="horizontal">
+				<TextView 
+				  	android:layout_width="fill_parent"
+				  	android:layout_height="wrap_content"
+				  	android:layout_weight="5"
+				  	android:text="@string/nameLabel"/>
+				<TextView
+				  	android:id="@+id/nametext"
+				  	android:layout_width="fill_parent"
+				  	android:layout_height="wrap_content"
+				  	android:layout_weight="2"/>
+		    </LinearLayout>
+		    <LinearLayout
+		        android:layout_width="fill_parent"
+		        android:layout_height="wrap_content"
+		        android:orientation="horizontal">
+				<TextView 
+				  	android:layout_width="fill_parent"
+				  	android:layout_height="wrap_content"
+				  	android:text="@string/positionLabel"
+				  	android:layout_weight="2"/>
+				<TextView
+				  	android:id="@+id/browse_lattext"
+				  	android:layout_width="fill_parent"
+				  	android:layout_height="wrap_content"
+				  	android:layout_weight="2"/>
+				<TextView 
+				  	android:id="@+id/browse_longtext"
+				  	android:layout_width="fill_parent"
+				  	android:layout_height="wrap_content"
+				  	android:layout_weight="2"/>
+		    </LinearLayout>
+		    <LinearLayout
+		        android:layout_width="fill_parent"
+		        android:layout_height="wrap_content"
+		        android:orientation="horizontal">
+				<TextView 
+				  	android:layout_width="fill_parent"
+				  	android:layout_height="wrap_content"
+				  	android:text="@string/sizeLabel"
+				  	android:layout_weight="1"/>
+				<TextView
+				  	android:id="@+id/browse_sizetext"
+				  	android:layout_width="fill_parent"
+				  	android:layout_height="wrap_content"
+				  	android:layout_weight="1"/>
+				<TextView 
+				  	android:layout_width="fill_parent"
+				  	android:layout_height="wrap_content"
+				  	android:text="@string/ageLabel"
+				  	android:layout_weight="1"/>
+				<TextView 
+				  	android:id="@+id/browse_agetext"
+				  	android:layout_width="fill_parent"
+				  	android:layout_height="wrap_content"
+				  	android:layout_weight="1"/>
+		    </LinearLayout>
+		</LinearLayout>
+	<ListView
+	    android:id="@+id/list"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_below="@id/browse_prop_container"
+	    android:layout_above="@id/addcomment"
+	    />         
+ <!-- </LinearLayout> -->
+</RelativeLayout>
 

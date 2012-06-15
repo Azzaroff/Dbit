@@ -43,7 +43,10 @@ public class LogOnActivity extends Activity{
 		logonButton.setOnClickListener(new OnClickListener(){
 			
 			public void onClick(View v) {
-				if(user == null) user = dbhandle.getUser(name.getText().toString());
+				//debug
+				if(user == null) user = dbhandle.getUser("Work");
+				//normal
+//				if(user == null) user = dbhandle.getUser(name.getText().toString());
 				//db error
 				if(user == null){
 					Toast toast = Toast.makeText(getApplicationContext(), R.string.logonUserFailure, Toast.LENGTH_LONG);
@@ -53,7 +56,10 @@ public class LogOnActivity extends Activity{
 					return;
 				}
 				//test the password
-				if(user.testPassword(pwd.getText().toString())){
+				//debug
+				if(user.testPassword("test")){
+				//normal
+//				if(user.testPassword(pwd.getText().toString())){
 					Intent intent = new Intent(LogOnActivity.this, MainActivity.class);
 					intent.putExtra("UserData", user);
 					startActivity(intent);

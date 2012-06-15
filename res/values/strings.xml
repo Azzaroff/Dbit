@@ -40,7 +40,6 @@
     <string name="avatarFailure">Please add an avatar.</string>
     <string name="miscFailure">An unknown failure ocurred.</string>
     
-    
     <string name="change_Title">Change password</string>
     <string name="oldPwd">old password:</string>
     <string name="newPwd">new password:</string>
@@ -61,4 +60,5 @@
 	
 	<string name="latitude">lat.</string>
 	<string name="longitude">long.</string>
+	<string name="no_location">n.a.</string>
 </resources>
