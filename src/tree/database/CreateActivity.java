@@ -5,12 +5,17 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import tree.database.data.User;
+import tree.database.misc.GpsHandler;
 import tree.database.services.DatabaseHandler;
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
 import android.media.ExifInterface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -42,6 +47,9 @@ public class CreateActivity extends Activity{
 	private DatabaseHandler dbhandle;
 	
 	private User user;
+	
+	//camera intent stuff
+	Uri imageUri;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -103,10 +111,18 @@ public class CreateActivity extends Activity{
 					}
 					if(locationButton.isChecked()){
 						if(!exif.getLatLong(location)){
-							Toast toast = Toast.makeText(getParent(), getText(R.string.no_loc_support), Toast.LENGTH_LONG);
-							toast.show();
-							locationButton.performClick();
-							location = null;
+							//there are no gps information in the pictures
+							GpsHandler gpshandle = new GpsHandler(getParent());
+							Location l = gpshandle.updateLocation();
+							if(l != null){
+								location[0] = (float) l.getLatitude();
+								location[1] = (float) l.getLongitude();
+							}else{ //we can not get any information from the gps sensor, may we have to wait?
+								Toast toast = Toast.makeText(getParent(), getText(R.string.no_loc_support), Toast.LENGTH_LONG);
+								toast.show();
+								locationButton.performClick();
+								location = null;
+							}						
 						}
 					}else{
 						location = null;
@@ -115,7 +131,17 @@ public class CreateActivity extends Activity{
 						Toast toast = Toast.makeText(getParent(), getText(R.string.db_error), Toast.LENGTH_LONG);
 						toast.show();
 					}else{
-						finish();
+						File file = new File(TREE_PATH);
+						if(file.exists()) file.delete();
+						
+						Toast toast = Toast.makeText(getParent(), getText(R.string.db_success), Toast.LENGTH_LONG);
+						toast.show();
+						
+						picture = null;
+						setPicture(picture);
+						
+						//go back to main
+						
 					}
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
@@ -127,8 +153,14 @@ public class CreateActivity extends Activity{
 	}
 	
 	public void takePicture(){
-		Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-		getParent().startActivityForResult(cameraIntent, CAMERA_PIC_REQUEST);  
+		ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.TITLE, "New Picture");
+        values.put(MediaStore.Images.Media.DESCRIPTION, "From your Camera");
+        imageUri = getContentResolver().insert(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+		getParent().startActivityForResult(cameraIntent, CAMERA_PIC_REQUEST);
 	}
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -136,9 +168,21 @@ public class CreateActivity extends Activity{
 		Log.i(this.getClass().getSimpleName(), "request: "+requestCode);
 	    if (requestCode == CAMERA_PIC_REQUEST) {
 	    	Log.i(this.getClass().getSimpleName(), "camera return");
-	    	picture = (Bitmap) data.getExtras().get("data");
-	    	writePictureToStorage(picture);
-	    	setPicture(picture);
+	    	if (resultCode == Activity.RESULT_OK) {
+                try {
+                    picture = MediaStore.Images.Media.getBitmap(
+                            getContentResolver(), imageUri);
+                    picture = BitmapFactory.decodeFile(getRealPathFromURI(imageUri));
+                    setPicture(picture);
+                    if(picture != null){
+        	    		writePictureToStorage(picture);
+        	    	}
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+	    	
 	    }
 	}
 	
@@ -182,4 +226,12 @@ public class CreateActivity extends Activity{
 		}
 	}
 	
+	public String getRealPathFromURI(Uri contentUri) {
+        String[] proj = { MediaStore.Images.Media.DATA };
+        Cursor cursor = managedQuery(contentUri, proj, null, null, null);
+        int column_index = cursor
+                .getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        return cursor.getString(column_index);
+    }
 }

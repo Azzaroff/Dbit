@@ -9,7 +9,8 @@
 	    android:layout_width="fill_parent"
 	    android:layout_height="wrap_content"
 	    android:inputType="text"
-	    android:layout_alignParentBottom="true"/>
+	    android:layout_alignParentBottom="true"
+	    android:hint="@string/commentLabel"/>
     
 <!--     <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -22,6 +23,7 @@
     	android:id="@+id/gallery"
     	android:layout_width="fill_parent"
     	android:layout_height="wrap_content"
+    	android:longClickable="true"
     	android:layout_marginTop="5dip"
     	android:layout_marginBottom="5dip"
     	android:layout_alignParentTop="true"/>

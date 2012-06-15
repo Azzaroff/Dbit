@@ -1,5 +1,6 @@
 package tree.database;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -9,7 +10,10 @@ import tree.database.data.Tree;
 import tree.database.data.User;
 import tree.database.misc.LazyAdapter;
 import tree.database.services.DatabaseHandler;
+import android.R.dimen;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
@@ -21,14 +25,16 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.View.OnFocusChangeListener;
+import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Gallery;
 import android.widget.ImageView;
@@ -69,6 +75,16 @@ public class BrowseTabActivity extends Activity{
 	private GeoUpdateHandler updatehandler = new GeoUpdateHandler(); //handles gps updates
 	private Location currentLocation;
 	
+	//image display dialog
+	private Dialog image_dialog;
+	private ImageView image_dialog_image;
+	
+	//dialog IDs
+	private static final int SHOW_PICTURE_DIALOG = 0;
+	
+	//display metrics
+	DisplayMetrics displaymetrics;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -83,7 +99,7 @@ public class BrowseTabActivity extends Activity{
 		updateLocation();
 		
 		//get display dimensions
-		DisplayMetrics displaymetrics = new DisplayMetrics();
+		displaymetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
 		
 		nameText = (TextView)findViewById(R.id.nametext);
@@ -93,10 +109,10 @@ public class BrowseTabActivity extends Activity{
 	    ageText = (TextView)findViewById(R.id.browse_agetext);
 	    commentList = (ListView)findViewById(R.id.list);
 	    addComment = (EditText)findViewById(R.id.addcomment);
-	    addComment.setText(getText(R.string.commentLabel));
 	    
 	    gallery = (Gallery) findViewById(R.id.gallery);
 	    gallery.setAdapter(new ImageAdapter(this, Integer.parseInt(extras.getString("Tab")), displaymetrics));
+	    gallery.setLongClickable(true);
 
 //	    fill comment list
 	    if(treelist.size() > 0){
@@ -127,18 +143,30 @@ public class BrowseTabActivity extends Activity{
 			public boolean onLongClick(View v) {
 				Toast toast = Toast.makeText(getParent(), "long click - do something useful here", Toast.LENGTH_LONG);
 				toast.show();
+				//debug
+				Log.i(this.getClass().getSimpleName(), "long click");
+				//prepare dialog
+				image_dialog.setTitle(treelist.get((int)gallery.getSelectedItemId()).Name);
+				image_dialog_image.setImageBitmap(treelist.get((int)gallery.getSelectedItemId()).Images.get(0));
+				//show dialog
+				image_dialog.show();
+				
 				return false;
 			}
 		});
 	    
-	    addComment.setOnFocusChangeListener(new OnFocusChangeListener() {
-			
-			public void onFocusChange(View v, boolean hasFocus) {
-				if(hasFocus){
-					if(addComment.getText().toString().equals(getParent().getText(R.string.commentLabel))){
-						addComment.setText("");
-					}
-				}
+	    gallery.setOnItemLongClickListener(new OnItemLongClickListener() {
+
+			public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
+					int arg2, long arg3) {
+				Toast toast = Toast.makeText(getParent(), "long item click - do something useful here", Toast.LENGTH_LONG);
+				toast.show();
+				//debug
+				Log.i(this.getClass().getSimpleName(), "long click");
+				onPrepareDialog(SHOW_PICTURE_DIALOG, image_dialog);
+				//show dialog
+				showDialog(SHOW_PICTURE_DIALOG);
+				return false;
 			}
 		});
 	    
@@ -150,6 +178,8 @@ public class BrowseTabActivity extends Activity{
 						addComment.clearFocus();
 						InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 						imm.hideSoftInputFromWindow(addComment.getWindowToken(), 0);
+						laList = new LazyAdapter(getParent(), dbhandle.getCommentList(treelist.get(selectedtree).ID));
+				        commentList.setAdapter(laList);
 					}else{
 						Toast toast = Toast.makeText(getParent(), getParent().getText(R.string.db_error), Toast.LENGTH_LONG);
 						toast.show();
@@ -159,18 +189,19 @@ public class BrowseTabActivity extends Activity{
 				return false;
 			}
 		});
-	    
+	    image_dialog = onCreateDialog(SHOW_PICTURE_DIALOG);
 	}
 	
 	private void showTreeInfo(int selectedTree){
 		 //fill properties
         Tree tree = treelist.get(selectedTree);
         if(tree.Location[0] == Double.MAX_VALUE){
-        	longitudeText.setText(getText(R.string.no_location).toString()+getText(R.string.longitude).toString());
-        	latitudeText.setText(getText(R.string.no_location).toString()+getText(R.string.latitude).toString());
+        	longitudeText.setText(getText(R.string.no_location).toString()+" "+getText(R.string.longitude).toString());
+        	latitudeText.setText(getText(R.string.no_location).toString()+" "+getText(R.string.latitude).toString());
         }else{
-        	longitudeText.setText(""+tree.Location[1]+"° "+getText(R.string.longitude).toString());
-        	latitudeText.setText(""+tree.Location[0]+"° "+getText(R.string.latitude).toString());
+        	DecimalFormat df = new DecimalFormat("0.000000");
+        	longitudeText.setText(""+df.format(tree.Location[1])+"° "+getText(R.string.longitude).toString());
+        	latitudeText.setText(""+df.format(tree.Location[0])+"° "+getText(R.string.latitude).toString());
         }
         nameText.setText(tree.Name);
         Log.i(this.getClass().getSimpleName(), "klappt");
@@ -183,6 +214,42 @@ public class BrowseTabActivity extends Activity{
         laList = new LazyAdapter(getParent(), tree.Comments);
         commentList.setAdapter(laList);
 //	    Utilities.setListViewHeightBasedOnChildren(commentList);
+	}
+	
+	protected Dialog onCreateDialog(int id){
+		final Dialog dialog;
+		switch(id){
+		case SHOW_PICTURE_DIALOG:{
+			//prepare dialog
+		    dialog = new Dialog(getParent().getParent().getParent());
+		    dialog.setContentView(R.layout.picture_dialog);
+		    dialog.setCancelable(true);
+		    Button dialog_button = (Button) dialog.findViewById(R.id.picture_dialog_button);
+		    
+		    dialog_button.setOnClickListener(new OnClickListener() {
+				public void onClick(View v) {
+					dialog.dismiss();
+				}
+			});
+		    return dialog;
+		}
+			
+		}
+		return null;
+	}
+	
+	protected void onPrepareDialog(int id, Dialog dialog){
+		super.onPrepareDialog(id, dialog);
+		switch(id){
+			case SHOW_PICTURE_DIALOG:{
+				dialog.setTitle(treelist.get((int)gallery.getSelectedItemId()).Name);
+				ImageView dialog_image = (ImageView) dialog.findViewById(R.id.picture_dialog_image);
+				dialog_image.setImageBitmap(Bitmap.createScaledBitmap(treelist.get((int)gallery.getSelectedItemId()).Images.get(0), (int)(displaymetrics.widthPixels*0.9f), (int)(displaymetrics.widthPixels*0.9)/3*4, true));
+				dialog_image.setScaleType(ImageView.ScaleType.FIT_XY);
+				break;
+			}
+		}
+		
 	}
 	
 	private boolean saveComment(){
@@ -220,7 +287,7 @@ public class BrowseTabActivity extends Activity{
 	        	location[0] = (float)currentLocation.getLatitude();
 	        	location[1] = (float)currentLocation.getLongitude();
 	        }
-	        treelist = dbhandle.getTreeList(location, 15, user);
+	        treelist = dbhandle.getTreeList(location, 15, user, getParent());
 	        
 	        imageList = new ArrayList<Bitmap>();
 	        for(Tree t : treelist){

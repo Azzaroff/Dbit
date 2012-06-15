@@ -44,7 +44,7 @@ public class LogOnActivity extends Activity{
 			
 			public void onClick(View v) {
 				//debug
-				if(user == null) user = dbhandle.getUser("Work");
+				if(user == null) user = dbhandle.getUser("weegee");
 				//normal
 //				if(user == null) user = dbhandle.getUser(name.getText().toString());
 				//db error

@@ -9,12 +9,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 
+import tree.database.R;
 import tree.database.data.Comment;
 import tree.database.data.Group;
 import tree.database.data.Tree;
 import tree.database.data.User;
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
@@ -24,7 +25,7 @@ public class DatabaseHandler{
 	private Connection connection;
 	private static String URL = "jdbc:postgresql://seclab10.medien.uni-weimar.de/baumdb?user=worker&password=mindless&ssl=true&sslfactory=org.postgresql.ssl.NonValidatingFactory";
 	
-	public ArrayList<Tree> getTreeList(float[] userlocation, double radius, User user){
+	public ArrayList<Tree> getTreeList(float[] userlocation, double radius, User user, Activity activity){
 		ResultSet rs;
 		
     	try {
@@ -65,6 +66,12 @@ public class DatabaseHandler{
 			}			
 			//check, if the statement changes DB entries
 			conn.close();
+			for(Tree t : tempmap.values()){
+				if(t.Images == null || t.Images.size() == 0){
+					//there are no images to this tree
+					t.Images.add(BitmapFactory.decodeResource(activity.getResources(), R.drawable.baum));
+				}
+			}
 			return new ArrayList<Tree>(tempmap.values());
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
@@ -260,7 +267,6 @@ public class DatabaseHandler{
 			Connection conn = DriverManager.getConnection(URL);
 			
 			PreparedStatement ps = conn.prepareStatement("SELECT uid, name, pw, rights FROM users WHERE (name = ?);");
-//			PreparedStatement ps = conn.prepareStatement("SELECT * FROM users WHERE (name = ? AND pw = ?);");
 			ps.setString(1, name);
 			rs = ps.executeQuery();
 		

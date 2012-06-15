@@ -25,7 +25,6 @@ public class BrowseActivity extends Activity{
 	    mlam = new LocalActivityManager(this, false);
 	    
 	    searchBar = (EditText)findViewById(R.id.browse_search);
-	    searchBar.setText(getText(R.string.searchText));
 	    
 	    tabHost = (TabHost) findViewById(android.R.id.tabhost);
 	    mlam.dispatchCreate(savedInstanceState);
