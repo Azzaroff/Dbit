@@ -62,7 +62,7 @@ public final class R {
         public static final int gallery=0x7f070003;
         public static final int groupList=0x7f070036;
         public static final int groupList_Name=0x7f070021;
-        public static final int groupList_subscribeToggle=0x7f070022;
+        public static final int groupList_checkbox=0x7f070022;
         public static final int join_group_cancel_button=0x7f070025;
         public static final int join_group_ok_button=0x7f070024;
         public static final int join_group_pwd=0x7f070023;

@@ -1,5 +1,7 @@
 package tree.database;
 
+import java.util.ArrayList;
+
 import tree.database.data.Group;
 import tree.database.data.User;
 import tree.database.misc.GrouplistAdapter;
@@ -38,6 +40,7 @@ public class SettingsActivity extends Activity{
 	//grouplist
 	private ListView groupListView;
 	private GrouplistAdapter gaList;
+	private ArrayList<Group> groups;
 	
 	//dialogs
 	private static final int SHOW_CHANGE_PWD_DIALOG = 0;
@@ -47,6 +50,7 @@ public class SettingsActivity extends Activity{
 	private Dialog change_pwd_dialog;
 	private Dialog create_group_dialog;
 	private Dialog join_group_dialog;
+	private Dialog leave_group_dialog;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -93,15 +97,30 @@ public class SettingsActivity extends Activity{
 		myTreeListView.setScrollbarFadingEnabled(true);
 		
 		//fill grouplist
-		gaList = new GrouplistAdapter(this, dbhandle.getGroupList(user.ID), user);
+		groups = dbhandle.getGroupList(user.ID);
+		gaList = new GrouplistAdapter(this, groups, user);
 		groupListView.setAdapter(gaList);
 		groupListView.setScrollbarFadingEnabled(true);
 		
 		groupListView.setOnItemClickListener(new OnItemClickListener() {
-			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-					long arg3) {
+			public void onItemClick(AdapterView<?> parent, View view, int position,
+					long ID) {
 				// TODO Auto-generated method stub
-				
+				if(ID == 0){
+					create_group_dialog = onCreateDialog(SHOW_CREATE_GROUP_DIALOG);
+					onPrepareDialog(SHOW_CREATE_GROUP_DIALOG, create_group_dialog);
+					showDialog(SHOW_CREATE_GROUP_DIALOG);
+				}else{
+					if(groups.get(((int)ID)).MemberList.contains(user.ID)){
+						leave_group_dialog = onCreateDialog(SHOW_LEAVE_GROUP_DIALOG);
+						onPrepareDialog(SHOW_LEAVE_GROUP_DIALOG, leave_group_dialog);
+						showDialog(SHOW_LEAVE_GROUP_DIALOG);
+					}else{
+						join_group_dialog = onCreateDialog(SHOW_JOIN_GROUP_DIALOG);
+						onPrepareDialog(SHOW_JOIN_GROUP_DIALOG, join_group_dialog);
+						showDialog(SHOW_JOIN_GROUP_DIALOG);
+					}
+				}
 			}
 		});
 	}

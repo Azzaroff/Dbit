@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.CompoundButton.OnCheckedChangeListener;
@@ -59,24 +60,13 @@ public class GrouplistAdapter extends BaseAdapter{
             vi = inflater.inflate(R.layout.group_list_item, null);
 
         TextView groupname = (TextView) vi.findViewById(R.id.groupList_Name);
-        ToggleButton subscribeButton = (ToggleButton) vi.findViewById(R.id.groupList_subscribeToggle);
+        CheckBox subscribeBox = (CheckBox) vi.findViewById(R.id.groupList_checkbox);
         
         groupname.setText(groups.get(position).Name);
         if(position == 0){
-        	subscribeButton.setTextOff(activity.getText(R.string.groupToggleCreate));
-        	subscribeButton.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-					//create new group
-					
-				}
-			});
+        	subscribeBox.setChecked(false);
         }else{
-        	subscribeButton.setChecked(groups.get(position).MemberList.contains(user));
-        	subscribeButton.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-					
-				}
-			});
+        	subscribeBox.setChecked(groups.get(position).MemberList.contains(user));
         }
         return vi;
     }
