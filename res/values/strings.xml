@@ -58,10 +58,25 @@
 	
 	<string name="comment_list_avatar">user avatar</string>
 	<string name="empty_comment">No comment was written.</string>
+	<string name="empty_treelist">There are no trees to show.</string>
 	
 	<string name="latitude">lat.</string>
 	<string name="longitude">long.</string>
 	<string name="no_location">n.a.</string>
 	
 	<string name="no_image">There is no Image to show.</string>
+	
+	<string name="groupToggleOn">Subscribed</string>
+    <string name="groupToggleOff">Subscribe</string>
+    <string name="groupToggleCreate">Create</string>
+    <string name="empty_groups">Add new Group.</string>
+    
+    <string name="create_group_title">Create new Group</string>
+    <string name="join_group_title">Join to group </string>
+    <string name="leave_group_title">Leave group </string>
+    <string name="groupname">Name of Group</string>
+    <string name="group_pwd">Password</string>
+    <string name="group_pwd_2">Repeate Password</string>
+    <string name="join_group_pwd">Enter group password:</string>
+    <string name="leave_group_text">Do you really want to leave this group?</string>
 </resources>

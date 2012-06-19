@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    >
+    <TextView 
+        android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:text="@string/leave_group_text"
+    />
+    <LinearLayout
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:orientation="horizontal"
+    >
+    	<Button 
+    		android:layout_width="fill_parent"
+	    	android:layout_height="wrap_content"
+	    	android:id="@+id/leave_group_ok_button"
+	    	android:text="@string/ok_button"/>
+    	<Button 
+    		android:layout_width="fill_parent"
+	    	android:layout_height="wrap_content"
+	    	android:id="@+id/leave_group_cancel_button"
+	    	android:text="@string/cancel_button"/>
+    </LinearLayout>
+</LinearLayout>

@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.HashMap;
 
 import tree.database.R;
+import tree.database.SettingsActivity;
 import tree.database.data.Comment;
 import tree.database.data.Group;
 import tree.database.data.Tree;
@@ -33,7 +34,15 @@ public class DatabaseHandler{
 			Class.forName("org.postgresql.Driver");
 			Connection conn = DriverManager.getConnection(URL);
 			
-			PreparedStatement ps = conn.prepareStatement("SELECT tid, long, lat, date, size, age, name FROM trees;");
+			PreparedStatement ps;
+			
+			ps = conn.prepareStatement("SELECT tid, long, lat, date, size, age, name FROM trees;");
+			
+			//for settings treelist
+			if(userlocation == null && activity.getClass().getSimpleName().equals(SettingsActivity.class.getSimpleName())){
+				ps = conn.prepareStatement("SELECT tid, long, lat, date, size, age, name FROM trees;");
+			}
+			
 			rs = ps.executeQuery();
 			
 //			select trees.tid, image_result.img FROM trees INNER JOIN (select tree_has_picture.tid, images.img from tree_has_picture inner join images on tree_has_picture.pid = images.pid) AS image_result ON trees.tid = image_result.tid;
@@ -213,16 +222,121 @@ public class DatabaseHandler{
 		return false;
 	}
 	
-	public ArrayList<Group> getGroupList(){
-		return new ArrayList<Group>();
+	public ArrayList<Group> getGroupList(int userID){
+		ResultSet rs;
+		
+		Group group = new Group();
+    	try {
+    		Log.i("postgres","Go Postgres!");
+			Class.forName("org.postgresql.Driver");
+			Connection conn = DriverManager.getConnection(URL);
+			
+			PreparedStatement ps = conn.prepareStatement("SELECT g.gid, g.name, g.pw FROM member_of_group mog INNER JOIN groups g ON mog.gid = g.gid;");
+			ps.setInt(1, userID);
+			rs = ps.executeQuery();
+		
+			Log.i(this.getClass().getSimpleName(), ps.toString());
+			HashMap<Integer, Group> groupmap = new HashMap<Integer, Group>();
+			
+			while(rs.next()){
+				group.ID = rs.getInt(1);
+				group.Name = rs.getString(2);
+				group.Password = rs.getString(3);
+				group.MemberList = new ArrayList<Integer>();
+				groupmap.put(group.ID, group);
+			}
+			rs.close();
+			ps.close();
+			//check, if the statement changes DB entries
+			ps = conn.prepareStatement("SELECT g.gid FROM member_of_group mog INNER JOIN groups g ON mog.gid = g.gid WHERE mog.uid = ?;");
+			ps.setInt(1, userID);
+			rs = ps.executeQuery();
+			
+			while(rs.next()){
+				if(groupmap.containsKey(rs.getInt(1))){
+					groupmap.get(rs.getInt(1)).MemberList.add(userID);
+				}
+			}
+			rs.close();
+			ps.close();
+			conn.close();
+			return new ArrayList<Group>(groupmap.values());
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+    	return new ArrayList<Group>();
 	}
 	
 	public boolean addGroup(String name, String password){
-		return true;
+		try {
+    		Log.i("postgres","Go Postgres!");
+			Class.forName("org.postgresql.Driver");
+			Connection conn = DriverManager.getConnection(URL);
+			
+			PreparedStatement ps = conn.prepareStatement("INSERT INTO groups (name, pw) VALUES (?, ?);");
+			ps.setString(1, name);
+			ps.setString(2, password);
+			
+			if(ps.executeUpdate() >= 1){
+				Log.i(this.getClass().getSimpleName(), "Add Group");
+				return true;
+			}
+			ps.close();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+    	return false;
 	}
 	
-	public boolean updateGroup(Group group){
-		return true;
+	public boolean addUserToGroup(int groupID, int userID){
+		try {
+			Class.forName("org.postgresql.Driver");
+			Connection conn = DriverManager.getConnection(URL);
+			
+			PreparedStatement ps = conn.prepareStatement("INSERT INTO member_of_group (uid, gid) VALUES (?, ?);");
+			ps.setInt(1, userID);
+			ps.setInt(2, groupID);
+			
+			if(ps.executeUpdate() >= 1){
+				Log.i(this.getClass().getSimpleName(), "Add User To Group");
+				return true;
+			}
+			ps.close();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+    	return false;	
+    }
+	
+	public boolean removeUserFromGroup(int groupID, int userID){
+		try {
+			Class.forName("org.postgresql.Driver");
+			Connection conn = DriverManager.getConnection(URL);
+			
+			PreparedStatement ps = conn.prepareStatement("DELETE FROM member_of_group WHERE uid = ? AND gid = ?;");
+			ps.setInt(1, userID);
+			ps.setInt(2, groupID);
+			
+			if(ps.executeUpdate() >= 1){
+				Log.i(this.getClass().getSimpleName(), "Remove User To Group");
+				return true;
+			}
+			ps.close();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+    	return false;
 	}
 	
 	public boolean addUser(User user){
@@ -242,6 +356,7 @@ public class DatabaseHandler{
 			ps.setBytes(4, baos.toByteArray());
 			
 			if(ps.executeUpdate() >= 1){
+				Log.i(this.getClass().getSimpleName(), "Add User");
 				return true;
 			}
 			ps.close();
@@ -250,7 +365,6 @@ public class DatabaseHandler{
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		Log.i(this.getClass().getSimpleName(), "Add");
 		
     	return false;
 	}

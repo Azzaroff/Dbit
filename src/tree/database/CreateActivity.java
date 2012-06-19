@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.location.Location;
 import android.media.ExifInterface;
 import android.net.Uri;
@@ -55,7 +56,7 @@ public class CreateActivity extends Activity{
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.create);
+		setContentView(R.layout.create_tree);
 		
 		Bundle extras = getIntent().getExtras();
 		
@@ -175,7 +176,7 @@ public class CreateActivity extends Activity{
                     picture = BitmapFactory.decodeFile(getRealPathFromURI(imageUri));
                     setPicture(picture);
                     if(picture != null){
-        	    		writePictureToStorage(picture);
+        	    		picture = writePictureToStorage(picture);
         	    	}
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -206,12 +207,19 @@ public class CreateActivity extends Activity{
 		
 	}
 	
-	private void writePictureToStorage(Bitmap picture){
+	private Bitmap writePictureToStorage(Bitmap picture){
 		File folder = new File(TMP_PATH);
 		if(!folder.exists()){
 			folder.mkdir();
 			Log.i(this.getClass().getSimpleName(), "create Folder "+TMP_PATH);
 		}
+		//scale bitmap
+		// create a matrix for the manipulation
+		Matrix matrix = new Matrix();
+		// resize the bit map
+		matrix.postScale(1920, 1080);
+		// recreate the new Bitmap
+		picture = Bitmap.createBitmap(picture, 0, 0, picture.getWidth(), picture.getHeight(), matrix, false);
 		File file = new File(TREE_PATH);
     	try {
 			file.createNewFile();
@@ -224,6 +232,7 @@ public class CreateActivity extends Activity{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+    	return picture;
 	}
 	
 	public String getRealPathFromURI(Uri contentUri) {

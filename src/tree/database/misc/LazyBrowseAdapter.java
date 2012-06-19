@@ -14,13 +14,13 @@ import android.widget.Gallery;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class LazyAdapter extends BaseAdapter {
+public class LazyBrowseAdapter extends BaseAdapter {
     
     private Activity activity;
     private ArrayList<Comment> comments;
     private static LayoutInflater inflater=null;
     
-    public LazyAdapter(Activity a, ArrayList<Comment> comments) {
+    public LazyBrowseAdapter(Activity a, ArrayList<Comment> comments) {
         this.activity = a;
         this.comments = comments;
         this.inflater = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

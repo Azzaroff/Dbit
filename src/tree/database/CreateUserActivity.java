@@ -43,7 +43,7 @@ public class CreateUserActivity extends Activity{
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.createuser);
+		setContentView(R.layout.create_user);
 		
 //		toast = Toast.makeText(context, text, duration);
 		

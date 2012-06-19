@@ -8,7 +8,7 @@ import java.util.HashMap;
 import tree.database.data.Comment;
 import tree.database.data.Tree;
 import tree.database.data.User;
-import tree.database.misc.LazyAdapter;
+import tree.database.misc.LazyBrowseAdapter;
 import tree.database.services.DatabaseHandler;
 import android.R.dimen;
 import android.app.Activity;
@@ -64,7 +64,7 @@ public class BrowseTabActivity extends Activity{
 	private ArrayList<Tree> treelist = new ArrayList<Tree>();
 	
 	/*list adapter for listview*/
-	LazyAdapter laList = null;
+	LazyBrowseAdapter laList = null;
 	private ArrayList<HashMap<String, String>> myListing = new ArrayList<HashMap<String, String>>();
 	
 	//user
@@ -89,7 +89,7 @@ public class BrowseTabActivity extends Activity{
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.browsetab); 
+		setContentView(R.layout.browse_tab); 
 		
 		Bundle extras = getIntent().getExtras();
 		dbhandle = new DatabaseHandler();
@@ -116,9 +116,9 @@ public class BrowseTabActivity extends Activity{
 
 //	    fill comment list
 	    if(treelist.size() > 0){
-	    	laList = new LazyAdapter(this, dbhandle.getCommentList(treelist.get(selectedtree).ID));
+	    	laList = new LazyBrowseAdapter(this, dbhandle.getCommentList(treelist.get(selectedtree).ID));
 	    }else{
-	    	laList = new LazyAdapter(this, new ArrayList<Comment>());
+	    	laList = new LazyBrowseAdapter(this, new ArrayList<Comment>());
 	    }
 	    
 //	     Assign adapter to ListView
@@ -133,7 +133,7 @@ public class BrowseTabActivity extends Activity{
 	            selectedtree = position;
 	            
 	           showTreeInfo(position);
-	           laList = new LazyAdapter(getParent(), dbhandle.getCommentList(treelist.get(position).ID));
+	           laList = new LazyBrowseAdapter(getParent(), dbhandle.getCommentList(treelist.get(position).ID));
 	           commentList.setAdapter(laList);
 	        }
 	    });
@@ -178,7 +178,7 @@ public class BrowseTabActivity extends Activity{
 						addComment.clearFocus();
 						InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 						imm.hideSoftInputFromWindow(addComment.getWindowToken(), 0);
-						laList = new LazyAdapter(getParent(), dbhandle.getCommentList(treelist.get(selectedtree).ID));
+						laList = new LazyBrowseAdapter(getParent(), dbhandle.getCommentList(treelist.get(selectedtree).ID));
 				        commentList.setAdapter(laList);
 					}else{
 						Toast toast = Toast.makeText(getParent(), getParent().getText(R.string.db_error), Toast.LENGTH_LONG);
@@ -211,7 +211,7 @@ public class BrowseTabActivity extends Activity{
         if(tree.Comments == null){
         	tree.Comments = dbhandle.getCommentList(tree.ID);
         }
-        laList = new LazyAdapter(getParent(), tree.Comments);
+        laList = new LazyBrowseAdapter(getParent(), tree.Comments);
         commentList.setAdapter(laList);
 //	    Utilities.setListViewHeightBasedOnChildren(commentList);
 	}
