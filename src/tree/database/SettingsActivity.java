@@ -193,6 +193,7 @@ public class SettingsActivity extends Activity{
 						old_pwd.setText("");
 						new_pwd.setText("");
 						rep_new_pwd.setText("");
+						Log.i(this.getClass().getSimpleName(), "dismiss");
 						dialog.dismiss();
 					}
 				});

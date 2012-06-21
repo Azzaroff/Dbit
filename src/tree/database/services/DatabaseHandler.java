@@ -16,9 +16,12 @@ import tree.database.data.Comment;
 import tree.database.data.Group;
 import tree.database.data.Tree;
 import tree.database.data.User;
+import tree.database.misc.Connectivity;
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.util.Log;
 
 public class DatabaseHandler{
@@ -63,7 +66,7 @@ public class DatabaseHandler{
 			//get pictures if the rights are enought
 			if(user.Rights >= User.SHOW_PICTURES){
 				Log.i(this.getClass().getSimpleName(), "get pictures from database");
-				ps = conn.prepareStatement("SELECT tree_has_picture.tid, images.img FROM tree_has_picture INNER JOIN images ON tree_has_picture.pid = images.pid;");
+				ps = conn.prepareStatement("SELECT tree_has_picture.tid, images.img_thumb FROM tree_has_picture INNER JOIN images ON tree_has_picture.pid = images.pid;");
 				rs = ps.executeQuery();
 				Log.i(this.getClass().getSimpleName(), ps.toString());
 				while(rs.next()){
@@ -99,9 +102,6 @@ public class DatabaseHandler{
     		Log.i("postgres","Go Postgres!");
 			Class.forName("org.postgresql.Driver");
 			Connection conn = DriverManager.getConnection(URL);
-			
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			image.compress(Bitmap.CompressFormat.JPEG, 85, baos);
 			
 			PreparedStatement ps = conn.prepareStatement("INSERT INTO trees (long, lat, date, size, age, name) VALUES (?, ?, ?, ?, ?, ?) RETURNING tid;");
 			if(loc != null){
@@ -149,12 +149,29 @@ public class DatabaseHandler{
     		Log.i("postgres","Go Postgres!");
 			Class.forName("org.postgresql.Driver");
 			
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			image.compress(Bitmap.CompressFormat.JPEG, 85, baos);
+			//prepare and scale image
+			Matrix matrix = new Matrix();
+			matrix.preRotate(90);
+	        Bitmap resizedThumb = Bitmap.createBitmap(Bitmap.createScaledBitmap(image, 160, 120, true), 0, 0, 160, 120, matrix, true);
+	        Bitmap resized240 = Bitmap.createBitmap(Bitmap.createScaledBitmap(image, 320, 240, true), 0, 0, 320, 240, matrix, true);
+	        Bitmap resized480 = Bitmap.createBitmap(Bitmap.createScaledBitmap(image, 640, 480, true), 0, 0, 640, 480, matrix, true);
+	        Bitmap resized960 = Bitmap.createBitmap(Bitmap.createScaledBitmap(image, 1280, 960, true), 0, 0, 1280, 960, matrix, true);
 			
-			PreparedStatement ps = conn.prepareStatement("INSERT INTO images (date, img) VALUES (?, ?) RETURNING pid;");
+			ByteArrayOutputStream baosThumb = new ByteArrayOutputStream();
+			ByteArrayOutputStream baos240 = new ByteArrayOutputStream();
+			ByteArrayOutputStream baos480 = new ByteArrayOutputStream();
+			ByteArrayOutputStream baos960 = new ByteArrayOutputStream();
+			resizedThumb.compress(Bitmap.CompressFormat.JPEG, 85, baosThumb);
+			resized240.compress(Bitmap.CompressFormat.JPEG, 85, baos240);
+			resized480.compress(Bitmap.CompressFormat.JPEG, 85, baos480);
+			resized960.compress(Bitmap.CompressFormat.JPEG, 85, baos960);
+			
+			PreparedStatement ps = conn.prepareStatement("INSERT INTO images (date, img_thumb, img_240, img_480, img_960) VALUES (?, ?, ?, ?, ?) RETURNING pid;");
 			ps.setTimestamp(1, date);
-			ps.setBytes(2, baos.toByteArray());
+			ps.setBytes(2, baosThumb.toByteArray());
+			ps.setBytes(3, baos240.toByteArray());
+			ps.setBytes(4, baos480.toByteArray());
+			ps.setBytes(5, baos960.toByteArray());
 			
 			ResultSet rs = ps.executeQuery();
 			if(rs.next()){
@@ -602,5 +619,12 @@ public class DatabaseHandler{
 			e.printStackTrace();
 		}    	
 		return new ArrayList<Comment>();
+	}
+	
+	private Connection connectionHandler(Context context) throws SQLException{
+		if(Connectivity.isConnected(context)){
+			return DriverManager.getConnection(URL);
+		}
+		return null;
 	}
 }

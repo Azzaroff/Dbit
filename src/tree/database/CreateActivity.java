@@ -142,7 +142,6 @@ public class CreateActivity extends Activity{
 						setPicture(picture);
 						
 						//go back to main
-						
 					}
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
@@ -188,21 +187,23 @@ public class CreateActivity extends Activity{
 	}
 	
 	private void setPicture(Bitmap thumbnail){
+		Matrix matrix = new Matrix();
+		matrix.preRotate(90);
 		if(thumbnail == null){
 			//ew wurde noch kein Foto gemacht
 			File file = new File(TREE_PATH);
 			if(file.exists()){
 				//aber es liegt eines auf der sd karte
 				picture = BitmapFactory.decodeFile(file.getAbsolutePath());
-				photoView.setImageBitmap(Bitmap.createScaledBitmap(picture, getWindowManager().getDefaultDisplay().getWidth()/2, getWindowManager().getDefaultDisplay().getWidth()/8*3, true));
+				photoView.setImageBitmap(Bitmap.createBitmap(Bitmap.createScaledBitmap(picture, getWindowManager().getDefaultDisplay().getWidth()/2, getWindowManager().getDefaultDisplay().getWidth()/8*3, true), 0, 0, getWindowManager().getDefaultDisplay().getWidth()/2, getWindowManager().getDefaultDisplay().getWidth()/8*3, matrix, true));
 			}else{
 				//es liegt auch keines auf der sd karte, zeige ein standart bild
 				thumbnail = BitmapFactory.decodeFile("/mnt/sdcard/treeDB/img/baum.jpg");
-				photoView.setImageBitmap(Bitmap.createScaledBitmap(thumbnail, getWindowManager().getDefaultDisplay().getWidth()/2, getWindowManager().getDefaultDisplay().getWidth()/8*3, true));
+				photoView.setImageBitmap(Bitmap.createScaledBitmap(thumbnail,  getWindowManager().getDefaultDisplay().getWidth()/8*3, getWindowManager().getDefaultDisplay().getWidth()/2, true));
 			}
 		}else{
 			//es wurde ein foto gemacht, zeige es
-			photoView.setImageBitmap(Bitmap.createScaledBitmap(thumbnail, getWindowManager().getDefaultDisplay().getWidth()/2, getWindowManager().getDefaultDisplay().getWidth()/8*3, true));
+			photoView.setImageBitmap(Bitmap.createBitmap(Bitmap.createScaledBitmap(thumbnail, getWindowManager().getDefaultDisplay().getWidth()/2, getWindowManager().getDefaultDisplay().getWidth()/8*3, true), 0, 0, getWindowManager().getDefaultDisplay().getWidth()/2, getWindowManager().getDefaultDisplay().getWidth()/8*3, matrix, true));
 		}
 		
 	}
@@ -214,12 +215,6 @@ public class CreateActivity extends Activity{
 			Log.i(this.getClass().getSimpleName(), "create Folder "+TMP_PATH);
 		}
 		//scale bitmap
-		// create a matrix for the manipulation
-		Matrix matrix = new Matrix();
-		// resize the bit map
-		matrix.postScale(1920, 1080);
-		// recreate the new Bitmap
-		picture = Bitmap.createBitmap(picture, 0, 0, picture.getWidth(), picture.getHeight(), matrix, false);
 		File file = new File(TREE_PATH);
     	try {
 			file.createNewFile();

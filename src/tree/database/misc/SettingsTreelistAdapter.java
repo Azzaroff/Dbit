@@ -76,7 +76,7 @@ public class SettingsTreelistAdapter extends BaseAdapter{
         	latitudeText.setText(""+df.format(tree.Location[0])+"° "+activity.getText(R.string.latitude).toString());
         }
         sizeText.setText(Double.toString(tree.Size));
-        ageText.setText(tree.Age);
+        ageText.setText(""+tree.Age);
         
         image.setImageBitmap(tree.Images.get(0));
         

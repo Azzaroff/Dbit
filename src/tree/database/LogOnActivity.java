@@ -1,11 +1,12 @@
 package tree.database;
 
 import tree.database.data.User;
+import tree.database.misc.Connectivity;
 import tree.database.services.DatabaseHandler;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -25,11 +26,14 @@ public class LogOnActivity extends Activity{
 	private User user;
 	private DatabaseHandler dbhandle;
 	
+	private Context context;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.logon);
+		context = this;
 		
 		dbhandle = new DatabaseHandler();
 		
@@ -47,6 +51,12 @@ public class LogOnActivity extends Activity{
 				if(user == null) user = dbhandle.getUser("weegee");
 				//normal
 //				if(user == null) user = dbhandle.getUser(name.getText().toString());
+				//connection error
+				if(!Connectivity.isConnected(context)){
+					Toast toast = Toast.makeText(getApplicationContext(), R.string.network_error, Toast.LENGTH_LONG);
+					toast.show();
+					return;
+				}
 				//db error
 				if(user == null){
 					Toast toast = Toast.makeText(getApplicationContext(), R.string.logonUserFailure, Toast.LENGTH_LONG);
