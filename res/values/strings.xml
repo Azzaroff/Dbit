@@ -54,6 +54,7 @@
 	<string name="no_age">Please insert age.</string>
 	<string name="no_loc_support">Your device does not support location information in pictures.</string>
 	<string name="db_error">An database error occured.</string>
+	<string name="network_error">There is no network connection.</string>
 	<string name="db_success">Tree was uploaded.</string>
 	
 	<string name="comment_list_avatar">user avatar</string>

@@ -111,18 +111,18 @@ public class BrowseTabActivity extends Activity{
 	    addComment = (EditText)findViewById(R.id.addcomment);
 	    
 	    gallery = (Gallery) findViewById(R.id.gallery);
-	    gallery.setAdapter(new ImageAdapter(this, Integer.parseInt(extras.getString("Tab")), displaymetrics));
+//	    gallery.setAdapter(new ImageAdapter(this, Integer.parseInt(extras.getString("Tab")), displaymetrics));
 	    gallery.setLongClickable(true);
 
-//	    fill comment list
-	    if(treelist.size() > 0){
-	    	laList = new LazyBrowseAdapter(this, dbhandle.getCommentList(treelist.get(selectedtree).ID));
-	    }else{
-	    	laList = new LazyBrowseAdapter(this, new ArrayList<Comment>());
-	    }
-	    
-//	     Assign adapter to ListView
-	    commentList.setAdapter(laList);
+////	    fill comment list
+//	    if(treelist.size() > 0){
+//	    	laList = new LazyBrowseAdapter(this, dbhandle.getCommentList(treelist.get(selectedtree).ID));
+//	    }else{
+//	    	laList = new LazyBrowseAdapter(this, new ArrayList<Comment>());
+//	    }
+//	    
+////	     Assign adapter to ListView
+//	    commentList.setAdapter(laList);
 	    commentList.setScrollbarFadingEnabled(true);
 	    
 	    //gallery on click
@@ -174,7 +174,7 @@ public class BrowseTabActivity extends Activity{
 			public boolean onKey(View v, int keyCode, KeyEvent event) {
 				if(keyCode == 66){
 					if(saveComment()){
-						addComment.setText(getParent().getText(R.string.commentLabel));
+						addComment.setText("");
 						addComment.clearFocus();
 						InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 						imm.hideSoftInputFromWindow(addComment.getWindowToken(), 0);
@@ -193,6 +193,7 @@ public class BrowseTabActivity extends Activity{
 	}
 	
 	private void showTreeInfo(int selectedTree){
+		if(treelist.size() == 0) return;
 		 //fill properties
         Tree tree = treelist.get(selectedTree);
         if(tree.Location[0] == Double.MAX_VALUE){
@@ -288,8 +289,8 @@ public class BrowseTabActivity extends Activity{
 	        	location[1] = (float)currentLocation.getLongitude();
 	        }
 	        treelist = dbhandle.getTreeList(location, 15, user, getParent());
-	        
-	        imageList = new ArrayList<Bitmap>();
+
+			imageList = new ArrayList<Bitmap>();
 	        for(Tree t : treelist){
 	        	for(Bitmap b : t.Images){
 	        		imageList.add(b);
@@ -366,5 +367,23 @@ public class BrowseTabActivity extends Activity{
 
 		public void onStatusChanged(String provider, int status, Bundle extras) {
 		}
+	}
+	
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+		Bundle extras = getIntent().getExtras();
+		Log.i(this.getClass().getSimpleName(), "onResume");
+		gallery.setAdapter(new ImageAdapter(this, Integer.parseInt(extras.getString("Tab")), displaymetrics));
+//    fill comment list
+    if(treelist.size() > 0){
+    	laList = new LazyBrowseAdapter(this, dbhandle.getCommentList(treelist.get(selectedtree).ID));
+    }else{
+    	laList = new LazyBrowseAdapter(this, new ArrayList<Comment>());
+    }
+    
+//     Assign adapter to ListView
+    commentList.setAdapter(laList);
 	}
 }
