@@ -39,7 +39,8 @@ public class GrouplistAdapter extends BaseAdapter{
         //add "create" item
     	Group g = new Group();
     	g.Name = activity.getText(R.string.empty_groups).toString();
-    	groups.add(0, g);
+    	this.groups.add(0, g);
+    	Log.i(this.getClass().getSimpleName(), "Number of Groups: "+(this.groups.size()-1));
     }
 
     public int getCount() {
@@ -62,11 +63,13 @@ public class GrouplistAdapter extends BaseAdapter{
         TextView groupname = (TextView) vi.findViewById(R.id.groupList_Name);
         CheckBox subscribeBox = (CheckBox) vi.findViewById(R.id.groupList_checkbox);
         
+        Log.i(this.getClass().getSimpleName(), "Fill grouplist view.");
+        
         groupname.setText(groups.get(position).Name);
         if(position == 0){
         	subscribeBox.setChecked(false);
         }else{
-        	subscribeBox.setChecked(groups.get(position).MemberList.contains(user));
+        	subscribeBox.setChecked(groups.get(position).MemberList.contains(user.ID));
         }
         return vi;
     }

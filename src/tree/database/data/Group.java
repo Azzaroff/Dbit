@@ -35,6 +35,8 @@ public class Group {
 	
 	public boolean testPassword(String Password){
 		Log.i(this.getClass().getSimpleName(), "test password");
+		Log.i(this.getClass().getSimpleName(), "pwd: "+(sha256(Password)));
+		Log.i(this.getClass().getSimpleName(), "test password "+this.Password);
 		return this.Password.equals(sha256(Password));
 	}
 	

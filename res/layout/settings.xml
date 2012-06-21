@@ -9,13 +9,12 @@
         android:layout_width="fill_parent"
     	android:layout_height="wrap_content"
     	android:orientation="horizontal"
-    	android:layout_weight=".4">
+    	android:layout_weight=".2">
     	
         <ImageView 
             android:id="@+id/avatarImage"
             android:layout_width="wrap_content"
     		android:layout_height="wrap_content"
-    		android:layout_weight=".5"
     		android:layout_marginTop="15dip"
     		android:contentDescription="@string/avatarImage"
     	/>
@@ -40,11 +39,11 @@
     	</LinearLayout>
     </LinearLayout>
     
-    <LinearLayout
+   <LinearLayout
         android:layout_width="fill_parent"
     	android:layout_height="wrap_content"
     	android:orientation="vertical"
-    	android:layout_weight=".6"
+    	android:layout_weight="1"
     	>
 
 	    <TextView 
@@ -57,26 +56,24 @@
 	        android:layout_width="fill_parent"
 			android:layout_height="wrap_content"/>
     
-	</LinearLayout>
-	
-    <LinearLayout
-        android:layout_width="fill_parent"
-    	android:layout_height="wrap_content"
-    	android:orientation="horizontal"
-    	android:layout_weight=".6"
-    	>
-    
-	    <TextView 
+		</LinearLayout>
+	 <LinearLayout
 	        android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
-			android:text="@string/groupList"/>
+	    	android:layout_height="wrap_content"
+	    	android:orientation="vertical"
+	    	android:layout_weight=".8"
+	    	>
 	    
-	    <ListView 
-	        android:id="@+id/groupList"
-	        android:layout_width="fill_parent"
-			android:layout_height="wrap_content"/>
-	    
-	</LinearLayout>
-    
+		    <TextView 
+		        android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:text="@string/groupList"/>
+		    
+		    <ListView 
+		        android:id="@+id/myGroupList"
+		        android:layout_width="fill_parent"
+				android:layout_height="wrap_content"/>
+		    
+		</LinearLayout> 
 </LinearLayout>
     

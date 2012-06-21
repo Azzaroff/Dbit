@@ -60,7 +60,6 @@ public final class R {
         public static final int createuserbutton=0x7f070029;
         public static final int delButton=0x7f070034;
         public static final int gallery=0x7f070003;
-        public static final int groupList=0x7f070036;
         public static final int groupList_Name=0x7f070021;
         public static final int groupList_checkbox=0x7f070022;
         public static final int join_group_cancel_button=0x7f070025;
@@ -72,6 +71,7 @@ public final class R {
         public static final int list=0x7f07000a;
         public static final int locationToggle=0x7f07001c;
         public static final int logonbutton=0x7f070028;
+        public static final int myGroupList=0x7f070036;
         public static final int myTreeList=0x7f070035;
         public static final int nametext=0x7f070005;
         public static final int pictureButton=0x7f070019;
@@ -98,12 +98,12 @@ public final class R {
         public static final int browse_tab=0x7f030003;
         public static final int change_password=0x7f030004;
         public static final int comment_list_item=0x7f030005;
-        public static final int create_group=0x7f030006;
+        public static final int create_group_dialog=0x7f030006;
         public static final int create_tree=0x7f030007;
         public static final int create_user=0x7f030008;
         public static final int group_list_item=0x7f030009;
-        public static final int join_group=0x7f03000a;
-        public static final int leave_group=0x7f03000b;
+        public static final int join_group_dialog=0x7f03000a;
+        public static final int leave_group_dialog=0x7f03000b;
         public static final int logon=0x7f03000c;
         public static final int main=0x7f03000d;
         public static final int my_treelist_item=0x7f03000e;

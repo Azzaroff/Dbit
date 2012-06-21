@@ -51,6 +51,7 @@ public class SettingsActivity extends Activity{
 	private Dialog create_group_dialog;
 	private Dialog join_group_dialog;
 	private Dialog leave_group_dialog;
+	private Group selectedgroup;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +72,7 @@ public class SettingsActivity extends Activity{
 		//treelist
 		myTreeListView = (ListView) findViewById(R.id.myTreeList);
 		//grouplist
-		groupListView = (ListView) findViewById(R.id.groupList);
+		groupListView = (ListView) findViewById(R.id.myGroupList);
 		
 		Log.i(this.getClass().getSimpleName(), user.toString());
 		user = dbhandle.getUserPicture(user);
@@ -91,27 +92,27 @@ public class SettingsActivity extends Activity{
 			}
 		});
 		
+		//fill grouplist
+		fillGroupList();
+		groupListView.setScrollbarFadingEnabled(true);
+		
 		//fill treelist
 		taList = new SettingsTreelistAdapter(this, dbhandle.getTreeList(null, 0.0 , user, this));
 		myTreeListView.setAdapter(taList);
 		myTreeListView.setScrollbarFadingEnabled(true);
 		
-		//fill grouplist
-		groups = dbhandle.getGroupList(user.ID);
-		gaList = new GrouplistAdapter(this, groups, user);
-		groupListView.setAdapter(gaList);
-		groupListView.setScrollbarFadingEnabled(true);
-		
 		groupListView.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> parent, View view, int position,
 					long ID) {
 				// TODO Auto-generated method stub
+				Log.i(this.getClass().getSimpleName(), "Item Click");
 				if(ID == 0){
 					create_group_dialog = onCreateDialog(SHOW_CREATE_GROUP_DIALOG);
 					onPrepareDialog(SHOW_CREATE_GROUP_DIALOG, create_group_dialog);
 					showDialog(SHOW_CREATE_GROUP_DIALOG);
 				}else{
-					if(groups.get(((int)ID)).MemberList.contains(user.ID)){
+					selectedgroup = groups.get((int)ID);
+					if(selectedgroup.MemberList.contains(user.ID)){
 						leave_group_dialog = onCreateDialog(SHOW_LEAVE_GROUP_DIALOG);
 						onPrepareDialog(SHOW_LEAVE_GROUP_DIALOG, leave_group_dialog);
 						showDialog(SHOW_LEAVE_GROUP_DIALOG);
@@ -137,28 +138,31 @@ public class SettingsActivity extends Activity{
 			dialog = new Dialog(getParent());
 			dialog.setContentView(R.layout.change_password);
 			dialog.setTitle(getText(R.string.change_Title));
-		 
 			return dialog;
 			}
 		case SHOW_CREATE_GROUP_DIALOG:{
 			//prepare dialog
 		    dialog = new Dialog(getParent());
 		    dialog.setTitle(R.string.create_group_title);
-			break;
+		    dialog.setContentView(R.layout.create_group_dialog);
+		    return dialog;
 			}
 		case SHOW_JOIN_GROUP_DIALOG:{
 			dialog = new Dialog(getParent());
-			break;
+			dialog.setContentView(R.layout.join_group_dialog);
+			return dialog;
 		}
 		case SHOW_LEAVE_GROUP_DIALOG:{
 			dialog = new Dialog(getParent());
+			dialog.setContentView(R.layout.leave_group_dialog);
+			return dialog;
 		}
 		}
 		return null;
 	}
 	
-	protected void onPrepareDialog(int id, final Dialog dialog, final Group group){
-		super.onPrepareDialog(id, dialog);
+	protected void onPrepareDialog(int id, final Dialog dialog){
+//		super.onPrepareDialog(id, dialog);
 		switch(id){
 			case SHOW_CHANGE_PWD_DIALOG:{
 				// set the custom dialog components - text, image and button
@@ -211,9 +215,12 @@ public class SettingsActivity extends Activity{
 					public void onClick(View v) {
 						if(pwd_1.getText().toString().equals(pwd_2.getText().toString())){
 							Group g = new Group(g_name.getText().toString(), pwd_1.getText().toString());
-							if(!dbhandle.addGroup(g.Name, g.Password)){
+							if(!dbhandle.addGroup(user.ID, g.Name, g.Password)){
 								Toast toast = Toast.makeText(getParent(), getText(R.string.db_error), Toast.LENGTH_LONG);
 								toast.show();
+							}else{
+								fillGroupList();
+								dialog.dismiss();
 							}
 						}else{
 							Toast toast = Toast.makeText(getParent(), getText(R.string.pwdFailure), Toast.LENGTH_LONG);
@@ -231,7 +238,7 @@ public class SettingsActivity extends Activity{
 				break;
 			}
 			case SHOW_JOIN_GROUP_DIALOG:{
-				dialog.setTitle(R.string.join_group_title + group.Name);
+				dialog.setTitle(getText(R.string.join_group_title) +" "+ selectedgroup.Name);
 				
 				final EditText g_pwd = (EditText) dialog.findViewById(R.id.join_group_pwd);
 				final Button join_group_button = (Button)dialog.findViewById(R.id.join_group_ok_button);
@@ -245,10 +252,13 @@ public class SettingsActivity extends Activity{
 				
 				join_group_button.setOnClickListener(new OnClickListener() {
 					public void onClick(View v) {
-						if(group.testPassword(g_pwd.getText().toString())){
-							if(!dbhandle.addUserToGroup(group.ID, user.ID)){
+						if(selectedgroup.testPassword(g_pwd.getText().toString())){
+							if(!dbhandle.addUserToGroup(selectedgroup.ID, user.ID)){
 								Toast toast = Toast.makeText(getParent(), getText(R.string.db_error), Toast.LENGTH_LONG);
 								toast.show();
+							}else{
+								fillGroupList();
+								dialog.dismiss();
 							}
 						}else{
 							Toast toast = Toast.makeText(getParent(), getText(R.string.pwdFailure), Toast.LENGTH_LONG);
@@ -260,7 +270,7 @@ public class SettingsActivity extends Activity{
 				break;
 			}
 			case SHOW_LEAVE_GROUP_DIALOG:{
-				dialog.setTitle(R.string.leave_group_title + group.Name);
+				dialog.setTitle(getText(R.string.leave_group_title) +" "+ selectedgroup.Name);
 				final Button leave_group_button = (Button)dialog.findViewById(R.id.leave_group_ok_button);
 				final Button cancel_button = (Button)dialog.findViewById(R.id.leave_group_cancel_button);
 				
@@ -272,9 +282,12 @@ public class SettingsActivity extends Activity{
 				
 				leave_group_button.setOnClickListener(new OnClickListener() {
 					public void onClick(View v) {
-						if(!dbhandle.removeUserFromGroup(group.ID, user.ID)){
+						if(!dbhandle.removeUserFromGroup(selectedgroup.ID, user.ID)){
 							Toast toast = Toast.makeText(getParent(), getText(R.string.db_error), Toast.LENGTH_LONG);
 							toast.show();
+						}else{
+							fillGroupList();
+							dialog.dismiss();
 						}
 					}
 				});
@@ -300,5 +313,9 @@ public class SettingsActivity extends Activity{
 		}
 	}
 	
-	
+	protected void fillGroupList(){
+		groups = dbhandle.getGroupList(user.ID);
+		gaList = new GrouplistAdapter(this, groups, user);
+		groupListView.setAdapter(gaList);
+	}
 }

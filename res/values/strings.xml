@@ -73,8 +73,8 @@
     <string name="empty_groups">Add new Group.</string>
     
     <string name="create_group_title">Create new Group</string>
-    <string name="join_group_title">Join to group </string>
-    <string name="leave_group_title">Leave group </string>
+    <string name="join_group_title">Join to group</string>
+    <string name="leave_group_title">Leave group</string>
     <string name="groupname">Name of Group</string>
     <string name="group_pwd">Password</string>
     <string name="group_pwd_2">Repeate Password</string>

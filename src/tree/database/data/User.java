@@ -127,7 +127,10 @@ public class User implements Parcelable {
 	
 
 	public Boolean eqals(Object o){
-		return ID == ((User)o).ID && Name.equals(((User)o).Name) && Rights == ((User)o).Rights;
+		User tempuser = (User)o;
+		return ID == (tempuser).ID 
+				&& Name.equals(tempuser.Name) 
+				&& Rights == (tempuser.Rights);
 	}
 	
 }

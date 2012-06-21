@@ -242,20 +242,19 @@ public class DatabaseHandler{
 	public ArrayList<Group> getGroupList(int userID){
 		ResultSet rs;
 		
-		Group group = new Group();
-    	try {
+		try {
     		Log.i("postgres","Go Postgres!");
 			Class.forName("org.postgresql.Driver");
 			Connection conn = DriverManager.getConnection(URL);
 			
-			PreparedStatement ps = conn.prepareStatement("SELECT g.gid, g.name, g.pw FROM member_of_group mog INNER JOIN groups g ON mog.gid = g.gid;");
-			ps.setInt(1, userID);
+			PreparedStatement ps = conn.prepareStatement("SELECT gid, name, pw FROM groups;");
 			rs = ps.executeQuery();
 		
 			Log.i(this.getClass().getSimpleName(), ps.toString());
 			HashMap<Integer, Group> groupmap = new HashMap<Integer, Group>();
 			
 			while(rs.next()){
+				Group group = new Group();
 				group.ID = rs.getInt(1);
 				group.Name = rs.getString(2);
 				group.Password = rs.getString(3);
@@ -286,19 +285,30 @@ public class DatabaseHandler{
     	return new ArrayList<Group>();
 	}
 	
-	public boolean addGroup(String name, String password){
+	public boolean addGroup(int uid, String name, String password){
 		try {
     		Log.i("postgres","Go Postgres!");
 			Class.forName("org.postgresql.Driver");
 			Connection conn = DriverManager.getConnection(URL);
 			
-			PreparedStatement ps = conn.prepareStatement("INSERT INTO groups (name, pw) VALUES (?, ?);");
+			PreparedStatement ps = conn.prepareStatement("INSERT INTO groups (name, pw) VALUES (?, ?) RETURNING gid;");
 			ps.setString(1, name);
 			ps.setString(2, password);
 			
-			if(ps.executeUpdate() >= 1){
+			ResultSet rs = ps.executeQuery();
+			
+			if(rs.next()){
 				Log.i(this.getClass().getSimpleName(), "Add Group");
-				return true;
+				int gid = rs.getInt(1);
+				ps.close();
+				ps = conn.prepareStatement("INSERT INTO member_of_group (uid, gid) VALUES (?, ?);");
+				ps.setInt(1, uid);
+				ps.setInt(2, gid);
+				if(ps.executeUpdate() >= 1){
+					ps.close();
+					Log.i(this.getClass().getSimpleName(), "User inserted to group.");
+					return true;
+				}
 			}
 			ps.close();
 		} catch (ClassNotFoundException e) {
@@ -343,7 +353,7 @@ public class DatabaseHandler{
 			ps.setInt(2, groupID);
 			
 			if(ps.executeUpdate() >= 1){
-				Log.i(this.getClass().getSimpleName(), "Remove User To Group");
+				Log.i(this.getClass().getSimpleName(), "Remove user from group: success");
 				return true;
 			}
 			ps.close();
@@ -352,7 +362,6 @@ public class DatabaseHandler{
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
     	return false;
 	}
 	
