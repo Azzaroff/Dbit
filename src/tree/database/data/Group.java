@@ -22,7 +22,8 @@ public class Group {
 	
 	public Group(String Name, String Password){
 		this.Name = Name;
-		this.Password = sha256(Name);
+		this.Password = sha256(Password);
+//		Log.i(this.getClass().getSimpleName(), "Password: "+Password+" Hash: "+this.Password);
 	}
 	
 	public boolean equals(Object o) {  
@@ -34,9 +35,9 @@ public class Group {
 	}
 	
 	public boolean testPassword(String Password){
-		Log.i(this.getClass().getSimpleName(), "test password");
-		Log.i(this.getClass().getSimpleName(), "pwd: "+(sha256(Password)));
-		Log.i(this.getClass().getSimpleName(), "test password "+this.Password);
+//		Log.i(this.getClass().getSimpleName(), "test password");
+//		Log.i(this.getClass().getSimpleName(), "pwd: "+(sha256(Password)));
+//		Log.i(this.getClass().getSimpleName(), "test password "+this.Password);
 		return this.Password.equals(sha256(Password));
 	}
 	
