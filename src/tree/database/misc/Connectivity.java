@@ -14,6 +14,28 @@ public class Connectivity {
     public static final int NETWORK_TYPE_HSPAP=15; // Level 13
     public static final int NETWORK_TYPE_IDEN=11; // Level 8
     public static final int NETWORK_TYPE_LTE=13; // Level 11
+    
+    /**
+     * Problem occured, no connection or no detectable speed
+     */
+    public static final int NETWORK_CONNECTION_SPEED_UNKNOWN = -1;
+    /**
+     * GPRS and below (?!)
+     */
+    public static final int NETWORK_CONNECTION_SPEED_VERY_LOW = 0;
+    /**
+     * EGDE
+     */
+    public static final int NETWORK_CONNECTION_SPEED_LOW = 1;
+    /**
+     * UMTS and UMTS with HSDPA
+     */
+    public static final int NETWORK_CONNECTION_SPEED_MID = 2;
+    /**
+     * LTE and or WIFI
+     */
+    public static final int NETWORK_CONNECTION_SPEED_HIGH = 3;
+    
 
     /**
      * Check if there is any connectivity
@@ -34,6 +56,20 @@ public class Connectivity {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = cm.getActiveNetworkInfo();
         return (info != null && info.isConnected() && Connectivity.isConnectionFast(info.getType(),info.getSubtype()));
+    }
+    
+    /**
+     * Return the connection speed
+     * @param context
+     * @return
+     */
+    public static int getConnectionSpeed(Context context){
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo info = cm.getActiveNetworkInfo();
+        if(info != null && info.isConnected() && Connectivity.isConnectionFast(info.getType(),info.getSubtype())){
+        	return getConnectionSpeed(info.getType(),info.getSubtype());
+        }
+        return NETWORK_CONNECTION_SPEED_VERY_LOW;
     }
 
     /**
@@ -90,4 +126,57 @@ public class Connectivity {
         }
     }
 
+    /**
+     * Check if the connection speed
+     * @param type
+     * @param subType
+     * @return static network speed fields
+     */
+    public static int getConnectionSpeed(int type, int subType){
+        if(type==ConnectivityManager.TYPE_WIFI){
+            System.out.println("CONNECTED VIA WIFI");
+            return NETWORK_CONNECTION_SPEED_HIGH;
+        }else if(type==ConnectivityManager.TYPE_MOBILE){
+            switch(subType){
+            case TelephonyManager.NETWORK_TYPE_1xRTT:
+                return NETWORK_CONNECTION_SPEED_VERY_LOW; // ~ 50-100 kbps
+            case TelephonyManager.NETWORK_TYPE_CDMA:
+                return NETWORK_CONNECTION_SPEED_VERY_LOW; // ~ 14-64 kbps
+            case TelephonyManager.NETWORK_TYPE_EDGE:
+                return NETWORK_CONNECTION_SPEED_LOW; // ~ 50-100 kbps
+            case TelephonyManager.NETWORK_TYPE_EVDO_0:
+                return NETWORK_CONNECTION_SPEED_MID; // ~ 400-1000 kbps
+            case TelephonyManager.NETWORK_TYPE_EVDO_A:
+                return NETWORK_CONNECTION_SPEED_MID; // ~ 600-1400 kbps
+            case TelephonyManager.NETWORK_TYPE_GPRS:
+                return NETWORK_CONNECTION_SPEED_VERY_LOW; // ~ 100 kbps
+            case TelephonyManager.NETWORK_TYPE_HSDPA:
+                return NETWORK_CONNECTION_SPEED_MID; // ~ 2-14 Mbps
+            case TelephonyManager.NETWORK_TYPE_HSPA:
+                return NETWORK_CONNECTION_SPEED_MID; // ~ 700-1700 kbps
+            case TelephonyManager.NETWORK_TYPE_HSUPA:
+                return NETWORK_CONNECTION_SPEED_MID; // ~ 1-23 Mbps
+            case TelephonyManager.NETWORK_TYPE_UMTS:
+                return NETWORK_CONNECTION_SPEED_MID; // ~ 400-7000 kbps
+            // NOT AVAILABLE YET IN API LEVEL 7
+            case Connectivity.NETWORK_TYPE_EHRPD:
+                return NETWORK_CONNECTION_SPEED_MID; // ~ 1-2 Mbps
+            case Connectivity.NETWORK_TYPE_EVDO_B:
+                return NETWORK_CONNECTION_SPEED_MID; // ~ 5 Mbps
+            case Connectivity.NETWORK_TYPE_HSPAP:
+                return NETWORK_CONNECTION_SPEED_HIGH; // ~ 10-20 Mbps
+            case Connectivity.NETWORK_TYPE_IDEN:
+                return NETWORK_CONNECTION_SPEED_VERY_LOW; // ~25 kbps 
+            case Connectivity.NETWORK_TYPE_LTE:
+                return NETWORK_CONNECTION_SPEED_HIGH; // ~ 10+ Mbps
+            // Unknown
+            case TelephonyManager.NETWORK_TYPE_UNKNOWN:
+                return NETWORK_CONNECTION_SPEED_UNKNOWN; 
+            default:
+                return NETWORK_CONNECTION_SPEED_VERY_LOW;
+            }
+        }else{
+            return NETWORK_CONNECTION_SPEED_UNKNOWN;
+        }
+    }
 }

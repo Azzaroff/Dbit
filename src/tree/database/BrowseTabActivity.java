@@ -8,6 +8,7 @@ import java.util.HashMap;
 import tree.database.data.Comment;
 import tree.database.data.Tree;
 import tree.database.data.User;
+import tree.database.misc.Connectivity;
 import tree.database.misc.LazyBrowseAdapter;
 import tree.database.services.DatabaseHandler;
 import android.R.dimen;
@@ -147,7 +148,13 @@ public class BrowseTabActivity extends Activity{
 				Log.i(this.getClass().getSimpleName(), "long click");
 				//prepare dialog
 				image_dialog.setTitle(treelist.get((int)gallery.getSelectedItemId()).Name);
-				image_dialog_image.setImageBitmap(treelist.get((int)gallery.getSelectedItemId()).Images.get(0));
+				//get the right picture to show
+				Bitmap high_res_image = dbhandle.getHighResPicture(treelist.get((int)gallery.getSelectedItemId()).ID, Connectivity.getConnectionSpeed(getParent()));
+				if(high_res_image != null){
+					image_dialog_image.setImageBitmap(high_res_image);
+				}else{
+					image_dialog_image.setImageBitmap(treelist.get((int)gallery.getSelectedItemId()).Images.get(0));
+				}
 				//show dialog
 				image_dialog.show();
 				

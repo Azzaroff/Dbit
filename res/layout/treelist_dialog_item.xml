@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RelativeLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="fill_parent"
+  android:layout_height="fill_parent"
+  android:orientation="horizontal">
+  	<ImageView
+		android:id="@+id/treelist_dialog_treelist_picture"
+		android:layout_width="30dip"
+		android:layout_height="30dip"
+		android:paddingRight="6dip"
+		android:contentDescription="@string/no_image"
+		android:layout_alignParentLeft="true"
+		/>
+  	<CheckBox
+	  	android:id="@+id/treelist_dialog_treelist_checkbox"
+	  	android:layout_width="wrap_content"
+	  	android:layout_height="wrap_content"
+	  	android:clickable="false"
+	  	android:focusable="false"
+	  	android:checked="false"
+	  	android:layout_gravity="left"
+	  	android:layout_alignParentRight="true"/>
+  	
+  	<TextView
+	  	android:id="@+id/treelist_dialog_treelist_nametext"
+	  	android:layout_width="fill_parent"
+	  	android:layout_height="wrap_content"
+	  	android:layout_toRightOf="@id/treelist_dialog_treelist_picture"
+	  	android:layout_toLeftOf="@id/treelist_dialog_treelist_checkbox"/>
+</RelativeLayout>

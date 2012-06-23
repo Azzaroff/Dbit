@@ -3,11 +3,15 @@ package tree.database;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
+import tree.database.data.Tree;
 import tree.database.data.User;
 import tree.database.misc.GpsHandler;
+import tree.database.misc.TreelistDialogTreelistAdapter;
 import tree.database.services.DatabaseHandler;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
@@ -21,9 +25,16 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
@@ -38,6 +49,9 @@ public class CreateActivity extends Activity{
 	
 	private ToggleButton locationButton;
 	private Button createButton;
+	private Button selectButton;
+	
+	private CheckBox addCheckBox;
 	
 	private static final int CAMERA_PIC_REQUEST = 4711;
 	protected static final String TREE_PATH = "/mnt/sdcard/treeDB/tmp/tree.jpg";
@@ -46,8 +60,14 @@ public class CreateActivity extends Activity{
 	private Bitmap picture;
 	
 	private DatabaseHandler dbhandle;
+	private GpsHandler gpshandle;
 	
 	private User user;
+	
+	private static final int SHOW_TREELIST_DIALOG = 0;
+	private Dialog treelistDialog;
+	private Tree selectedTree = null;
+	private Tree localSelectedTree = null;
 	
 	//camera intent stuff
 	Uri imageUri;
@@ -63,20 +83,21 @@ public class CreateActivity extends Activity{
 		user = extras.getParcelable("UserData");
 
 		dbhandle = new DatabaseHandler();
+		gpshandle = new GpsHandler(getParent());
 		
 		photoView = (ImageView) findViewById(R.id.pictureView);
 		setPicture(picture);
 		
 		takePictureButton = (Button) findViewById(R.id.pictureButton);
 		locationButton = (ToggleButton) findViewById(R.id.locationToggle);
-		createButton = (Button) findViewById(R.id.createButton);
+		createButton = (Button) findViewById(R.id.create_tree_create_button);
+		selectButton = (Button) findViewById(R.id.create_tree_select_button);
+		
+		addCheckBox = (CheckBox) findViewById(R.id.create_tree_checkbox);
 		
 		nameText = (EditText) findViewById(R.id.nametext);
 		ageText = (EditText) findViewById(R.id.agetext);
 		sizeText = (EditText) findViewById(R.id.sizetext);
-		
-		locationButton = (ToggleButton) findViewById(R.id.locationToggle);
-		createButton = (Button) findViewById(R.id.createButton);
 		
 		takePictureButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
@@ -89,65 +110,125 @@ public class CreateActivity extends Activity{
 				//teste, ob alles ausgefüllt wurde
 				float[] location = new float[2];
 				try {
-					ExifInterface exif = new ExifInterface(TREE_PATH);
 					if(picture == null){
 						Toast toast = Toast.makeText(getParent(), getText(R.string.no_picture), Toast.LENGTH_LONG);
 						toast.show();
 						return;
 					}
-					if(nameText.getText().toString().length() < 1){
-						Toast toast = Toast.makeText(getParent(), getText(R.string.no_name), Toast.LENGTH_LONG);
-						toast.show();
-						return;
-					}
-					if(sizeText.getText().toString().length() < 1){
-						Toast toast = Toast.makeText(getParent(), getText(R.string.no_size), Toast.LENGTH_LONG);
-						toast.show();
-						return;
-					}
-					if(ageText.getText().toString().length() < 1){
-						Toast toast = Toast.makeText(getParent(), getText(R.string.no_age), Toast.LENGTH_LONG);
-						toast.show();
-						return;
-					}
-					if(locationButton.isChecked()){
-						if(!exif.getLatLong(location)){
-							//there are no gps information in the pictures
-							GpsHandler gpshandle = new GpsHandler(getParent());
-							Location l = gpshandle.updateLocation();
-							if(l != null){
-								location[0] = (float) l.getLatitude();
-								location[1] = (float) l.getLongitude();
-							}else{ //we can not get any information from the gps sensor, may we have to wait?
-								Toast toast = Toast.makeText(getParent(), getText(R.string.no_loc_support), Toast.LENGTH_LONG);
-								toast.show();
-								locationButton.performClick();
-								location = null;
-							}						
+					if(addCheckBox.isChecked()){ //add new tree
+						ExifInterface exif = new ExifInterface(TREE_PATH);
+						if(nameText.getText().toString().length() < 1){
+							Toast toast = Toast.makeText(getParent(), getText(R.string.no_name), Toast.LENGTH_LONG);
+							toast.show();
+							return;
 						}
-					}else{
-						location = null;
-					}
-					if(!dbhandle.addTree(user.ID, picture, nameText.getText().toString(), location, Double.parseDouble(sizeText.getText().toString()), Integer.parseInt(ageText.getText().toString()))){
-						Toast toast = Toast.makeText(getParent(), getText(R.string.db_error), Toast.LENGTH_LONG);
-						toast.show();
-					}else{
-						File file = new File(TREE_PATH);
-						if(file.exists()) file.delete();
-						
-						Toast toast = Toast.makeText(getParent(), getText(R.string.db_success), Toast.LENGTH_LONG);
-						toast.show();
-						
-						picture = null;
-						setPicture(picture);
-						
-						//go back to main
+						if(sizeText.getText().toString().length() < 1){
+							Toast toast = Toast.makeText(getParent(), getText(R.string.no_size), Toast.LENGTH_LONG);
+							toast.show();
+							return;
+						}
+						if(ageText.getText().toString().length() < 1){
+							Toast toast = Toast.makeText(getParent(), getText(R.string.no_age), Toast.LENGTH_LONG);
+							toast.show();
+							return;
+						}
+						if(locationButton.isChecked()){
+							if(!exif.getLatLong(location)){
+								//there are no gps information in the pictures
+								Location l = gpshandle.updateLocation();
+								if(l != null){
+									location[0] = (float) l.getLatitude();
+									location[1] = (float) l.getLongitude();
+								}else{ //we can not get any information from the gps sensor, may we have to wait?
+									Toast toast = Toast.makeText(getParent(), getText(R.string.no_loc_support), Toast.LENGTH_LONG);
+									toast.show();
+									locationButton.performClick();
+									location = null;
+								}						
+							}
+						}else{
+							location = null;
+						}
+						if(!dbhandle.addTree(user.ID, picture, nameText.getText().toString(), location, Double.parseDouble(sizeText.getText().toString()), Integer.parseInt(ageText.getText().toString()))){
+							Toast toast = Toast.makeText(getParent(), getText(R.string.db_error), Toast.LENGTH_LONG);
+							toast.show();
+						}else{
+							File file = new File(TREE_PATH);
+							if(file.exists()) file.delete();
+							
+							Toast toast = Toast.makeText(getParent(), getText(R.string.db_success), Toast.LENGTH_LONG);
+							toast.show();
+							
+							picture = null;
+							setPicture(picture);
+							
+							//go back to main
+						}
+					}else{ //add picture to existing tree
+						if(selectedTree == null){
+							//no tree selected
+							Toast toast = Toast.makeText(getParent(), getText(R.string.tree_selection_error), Toast.LENGTH_LONG);
+							toast.show();
+						}else{
+							if(!dbhandle.addTreeImage(user.ID, selectedTree.ID, picture)){
+								Toast toast = Toast.makeText(getParent(), getText(R.string.db_error), Toast.LENGTH_LONG);
+								toast.show();
+							}else{
+								File file = new File(TREE_PATH);
+								if(file.exists()) file.delete();
+								
+								Toast toast = Toast.makeText(getParent(), getText(R.string.db_success), Toast.LENGTH_LONG);
+								toast.show();
+								
+								picture = null;
+								setPicture(picture);
+							}
+						}
 					}
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				
+			}
+		});
+		
+		addCheckBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				// TODO Auto-generated method stub
+				nameText.setEnabled(isChecked);
+				ageText.setEnabled(isChecked);
+				sizeText.setEnabled(isChecked);
+				selectButton.setEnabled(isChecked);
+				if(isChecked){ //add new tree
+					if(selectedTree != null){
+						nameText.setText("");
+						ageText.setText("");
+						sizeText.setText("");
+						locationButton.setSelected(false);
+					}
+				}else{ //add picture to existing tree
+					if(selectedTree != null){
+						nameText.setText(selectedTree.Name);
+						ageText.setText(""+selectedTree.Age);
+						sizeText.setText(""+selectedTree.Size);
+						if(selectedTree.Location[0] < Double.MAX_VALUE){
+							locationButton.setSelected(true);
+						}else{
+							locationButton.setSelected(false);
+						}
+					}
+				}
+			}
+		});
+		
+		selectButton.setOnClickListener(new OnClickListener() {
+			
+			public void onClick(View v) {
+				treelistDialog = onCreateDialog(SHOW_TREELIST_DIALOG);
+				onPrepareDialog(SHOW_TREELIST_DIALOG, treelistDialog);
+				showDialog(SHOW_TREELIST_DIALOG, treelistDialog);
 			}
 		});
 	}
@@ -238,4 +319,73 @@ public class CreateActivity extends Activity{
         cursor.moveToFirst();
         return cursor.getString(column_index);
     }
+	
+	protected Dialog onCreateDialog(int id){
+		final Dialog dialog;
+		switch(id){
+		case SHOW_TREELIST_DIALOG:{
+			//prepare dialog
+			dialog = new Dialog(getParent());
+			dialog.setContentView(R.layout.treelist_dialog);
+			dialog.setTitle(getText(R.string.treelist_dialog_title));
+			return dialog;
+		}
+		};
+		return null;
+	}
+	
+	protected void onPrepareDialog(int id, final Dialog dialog){
+//		super.onPrepareDialog(id, dialog);
+		switch(id){
+			case SHOW_TREELIST_DIALOG:{
+				ListView treelistview = (ListView) dialog.findViewById(R.id.treelist_dialog_TreeList);
+				//get treelist
+				Location l = gpshandle.updateLocation();
+				float loc[] = {(float)l.getLatitude(), (float)l.getLongitude()};
+				final ArrayList<Tree> trees = dbhandle.getTreeList(loc, 15, user, getParent());
+				//set treelist adapter
+				final TreelistDialogTreelistAdapter tdtaList = new TreelistDialogTreelistAdapter(this, trees);
+				
+				//set treelist clicklistener
+				treelistview.setOnItemClickListener(new OnItemClickListener() {
+					
+					public void onItemClick(AdapterView<?> parent, View view, int position,
+							long ID) {
+						// TODO Auto-generated method stub
+						tdtaList.setSelectedTree((int)ID);
+						localSelectedTree = trees.get((int)ID);
+					}
+				});
+				
+				Button okButton = (Button) dialog.findViewById(R.id.treelist_dialog_ok_button);
+				Button cancelButton = (Button) dialog.findViewById(R.id.treelist_dialog_cancel_button);
+				// if button is clicked, close the custom dialog
+				okButton.setOnClickListener(new OnClickListener() {
+					public void onClick(View v) {
+						selectedTree = localSelectedTree;
+						nameText.setText(selectedTree.Name);
+						sizeText.setText(""+selectedTree.Size);
+						ageText.setText(""+selectedTree.Age);
+						dialog.dismiss();
+					}
+				});
+				
+				cancelButton.setOnClickListener(new OnClickListener() {
+					public void onClick(View v) {
+						localSelectedTree = null;
+						dialog.dismiss();
+					}
+				});
+				break;
+			}
+		};
+	}
+			
+	protected void showDialog(int id, Dialog dialog){
+		switch(id){
+			case SHOW_TREELIST_DIALOG:{
+				dialog.show();
+			}
+		};
+	}
 }

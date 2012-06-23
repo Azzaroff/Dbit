@@ -24,6 +24,32 @@
         android:layout_gravity="center_horizontal"
         />
     
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+		<TextView
+		  	android:layout_width="fill_parent"
+		  	android:layout_height="fill_parent"
+		  	android:text="@string/newTreeLabel"
+		  	android:layout_alignParentLeft="true"/>
+		<CheckBox 
+		    android:id="@+id/create_tree_checkbox"
+		  	android:layout_width="fill_parent"
+		  	android:layout_height="fill_parent"
+		  	android:clickable="false"
+		  	android:focusable="false"
+		  	android:checked="false"
+		  	android:layout_alignParentRight="true"/>
+	</RelativeLayout>
+	
+    <Button 
+        android:id="@+id/create_tree_select_button"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/selectButtonText"
+        />
+    
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -96,7 +122,7 @@
     </LinearLayout>
     
     <Button 
-        android:id="@+id/createButton"
+        android:id="@+id/create_tree_create_button"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/createButtonText"

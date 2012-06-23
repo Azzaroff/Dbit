@@ -139,8 +139,24 @@ public class DatabaseHandler{
     	return success;
 	}
 	
-	public boolean updateTree(Tree tree){
-		return true;
+	public boolean addTreeImage(int uid, int tid, Bitmap image){
+		try {
+    		Log.i("postgres","Go Postgres!");
+			Class.forName("org.postgresql.Driver");
+			Connection conn = DriverManager.getConnection(URL);
+			Date d = new Date();
+			int pid = addTreeImage(image, tid, conn, new java.sql.Timestamp(d.getTime()));
+			addTreeImageRelation(pid, tid, conn);
+			addUserImageRelation(uid,pid,conn);
+			
+			conn.close();
+			return true;
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 	
 	private int addTreeImage(Bitmap image, int treeID, Connection conn, java.sql.Timestamp date){
@@ -237,6 +253,67 @@ public class DatabaseHandler{
 		Log.i(this.getClass().getSimpleName(), "Add UserImageRelation pid:"+ pid + " uid:"+uid);
 		
 		return false;
+	}
+	
+	public Bitmap getHighResPicture(int tid, int connectionspeed) {
+		// TODO Auto-generated method stub
+		if(connectionspeed == Connectivity.NETWORK_CONNECTION_SPEED_UNKNOWN){
+			return null;
+		}else{
+			try {
+	    		Log.i("postgres","Go Postgres!");
+				Class.forName("org.postgresql.Driver");
+				Connection conn = DriverManager.getConnection(URL);
+				
+				PreparedStatement ps;
+				ResultSet rs;
+				Bitmap picture = null;
+				
+				switch(connectionspeed){
+				case Connectivity.NETWORK_CONNECTION_SPEED_VERY_LOW: {
+					return picture;
+				}
+				case Connectivity.NETWORK_CONNECTION_SPEED_LOW: {
+					ps = conn.prepareStatement("SELECT img_240 images WHERE pid = ?;");
+					rs = ps.executeQuery();
+					if(rs.next()){
+						byte[] bytes = rs.getBytes(1);
+					    picture = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+					}
+					ps.close();
+					rs.close();
+					return picture;
+				}
+				case Connectivity.NETWORK_CONNECTION_SPEED_MID: {
+					ps = conn.prepareStatement("SELECT img_480 images WHERE pid = ?;");
+					rs = ps.executeQuery();
+					if(rs.next()){
+						byte[] bytes = rs.getBytes(1);
+					    picture = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+					}
+					ps.close();
+					rs.close();
+					return picture;
+				}
+				case Connectivity.NETWORK_CONNECTION_SPEED_HIGH: {
+					ps = conn.prepareStatement("SELECT img_960 images WHERE pid = ?;");
+					rs = ps.executeQuery();
+					if(rs.next()){
+						byte[] bytes = rs.getBytes(1);
+					    picture = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+					}
+					ps.close();
+					rs.close();
+					return picture;
+				}
+				};
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return null;
 	}
 	
 	public ArrayList<Group> getGroupList(int userID){

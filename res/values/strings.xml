@@ -10,6 +10,7 @@
     <string name="searchText">search</string>
     
     <string name="nameLabel">Name</string>
+    <string name="newTreeLabel">Add new Tree</string>
     <string name="positionLabel">Position</string>
     <string name="commentLabel">Write a comment</string>
     
@@ -21,6 +22,7 @@
     <string name="locationToggleOn">include Location</string>
     <string name="locationToggleOff">exclude Location</string>
     <string name="createButtonText">Submit</string>
+    <string name="selectButtonText">Select Tree</string>
     
     <string name="avatarImage">Avatar</string>
     <string name="pwdButton">Change Password</string>
@@ -80,4 +82,7 @@
     <string name="group_pwd_2">Repeate Password</string>
     <string name="join_group_pwd">Enter group password:</string>
     <string name="leave_group_text">Do you really want to leave this group?</string>
+    
+    <string name="treelist_dialog_title">Select tree to add picture.</string>
+    <string name="tree_selection_error">Please select the tree you want to add a picture.</string>
 </resources>
