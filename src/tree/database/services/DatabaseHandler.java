@@ -255,9 +255,9 @@ public class DatabaseHandler{
 		return false;
 	}
 	
-	public Bitmap getHighResPicture(int tid, int connectionspeed) {
+	public Bitmap getHighResPicture(int tid, int picture_number, int connectionspeed) {
 		// TODO Auto-generated method stub
-		if(connectionspeed == Connectivity.NETWORK_CONNECTION_SPEED_UNKNOWN){
+		if(connectionspeed == Connectivity.NETWORK_CONNECTION_SPEED_UNKNOWN || connectionspeed == Connectivity.NETWORK_CONNECTION_SPEED_VERY_LOW){
 			return null;
 		}else{
 			try {
@@ -268,45 +268,22 @@ public class DatabaseHandler{
 				PreparedStatement ps;
 				ResultSet rs;
 				Bitmap picture = null;
+				String[] column = {"img_240", "img_480", "img_960"};
 				
-				switch(connectionspeed){
-				case Connectivity.NETWORK_CONNECTION_SPEED_VERY_LOW: {
-					return picture;
+				ps = conn.prepareStatement("SELECT ? images WHERE pid = ?;");
+				ps.setString(1, column[connectionspeed-1]);
+				ps.setInt(2, tid);
+				
+				rs = ps.executeQuery();
+				while(rs.next()){
+					picture_number --;
+					if(picture_number == 0) break;
 				}
-				case Connectivity.NETWORK_CONNECTION_SPEED_LOW: {
-					ps = conn.prepareStatement("SELECT img_240 images WHERE pid = ?;");
-					rs = ps.executeQuery();
-					if(rs.next()){
-						byte[] bytes = rs.getBytes(1);
-					    picture = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-					}
-					ps.close();
-					rs.close();
-					return picture;
-				}
-				case Connectivity.NETWORK_CONNECTION_SPEED_MID: {
-					ps = conn.prepareStatement("SELECT img_480 images WHERE pid = ?;");
-					rs = ps.executeQuery();
-					if(rs.next()){
-						byte[] bytes = rs.getBytes(1);
-					    picture = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-					}
-					ps.close();
-					rs.close();
-					return picture;
-				}
-				case Connectivity.NETWORK_CONNECTION_SPEED_HIGH: {
-					ps = conn.prepareStatement("SELECT img_960 images WHERE pid = ?;");
-					rs = ps.executeQuery();
-					if(rs.next()){
-						byte[] bytes = rs.getBytes(1);
-					    picture = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-					}
-					ps.close();
-					rs.close();
-					return picture;
-				}
-				};
+				byte[] bytes = rs.getBytes(0);
+			    picture = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+				ps.close();
+				rs.close();
+				return picture;
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			} catch (SQLException e) {

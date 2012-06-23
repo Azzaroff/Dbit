@@ -131,7 +131,7 @@ public class BrowseTabActivity extends Activity{
 	        public void onItemClick(AdapterView parent, View v, int position, long id) {
 	            Toast.makeText(BrowseTabActivity.this, "" + position, Toast.LENGTH_SHORT).show();
 	            
-	            selectedtree = position;
+	            selectedtree = getSelectedTree(position);
 	            
 	           showTreeInfo(position);
 	           laList = new LazyBrowseAdapter(getParent(), dbhandle.getCommentList(treelist.get(position).ID));
@@ -142,18 +142,16 @@ public class BrowseTabActivity extends Activity{
 	    gallery.setOnLongClickListener(new OnLongClickListener() {
 			
 			public boolean onLongClick(View v) {
-				Toast toast = Toast.makeText(getParent(), "long click - do something useful here", Toast.LENGTH_LONG);
-				toast.show();
 				//debug
 				Log.i(this.getClass().getSimpleName(), "long click");
 				//prepare dialog
-				image_dialog.setTitle(treelist.get((int)gallery.getSelectedItemId()).Name);
+				image_dialog.setTitle(treelist.get(selectedtree).Name);
 				//get the right picture to show
-				Bitmap high_res_image = dbhandle.getHighResPicture(treelist.get((int)gallery.getSelectedItemId()).ID, Connectivity.getConnectionSpeed(getParent()));
+				Bitmap high_res_image = dbhandle.getHighResPicture(treelist.get(selectedtree).ID, getSelectedTreeImage(gallery.getSelectedItemPosition()), Connectivity.getConnectionSpeed(getParent()));
 				if(high_res_image != null){
 					image_dialog_image.setImageBitmap(high_res_image);
 				}else{
-					image_dialog_image.setImageBitmap(treelist.get((int)gallery.getSelectedItemId()).Images.get(0));
+					image_dialog_image.setImageBitmap(treelist.get(selectedtree).Images.get(getSelectedTreeImage(gallery.getSelectedItemPosition())));
 				}
 				//show dialog
 				image_dialog.show();
@@ -376,6 +374,30 @@ public class BrowseTabActivity extends Activity{
 		}
 	}
 	
+	protected int getSelectedTree(int selectedItem){
+		int selectedTree = 0;
+		for(Tree t : treelist){
+			if(t.Images.size() < selectedItem){
+				return selectedTree;
+			}else{
+				selectedItem -= t.Images.size();
+				selectedTree++;
+			}
+		}
+		return -1;
+	}
+	
+	protected int getSelectedTreeImage(int selectedItem){
+		for(Tree t : treelist){
+			if(t.Images.size() < selectedItem){
+				return selectedItem;
+			}else{
+				selectedItem -= t.Images.size();
+			}
+		}
+		return -1;
+	}
+	
 	@Override
 	protected void onResume() {
 		// TODO Auto-generated method stub
@@ -383,14 +405,14 @@ public class BrowseTabActivity extends Activity{
 		Bundle extras = getIntent().getExtras();
 		Log.i(this.getClass().getSimpleName(), "onResume");
 		gallery.setAdapter(new ImageAdapter(this, Integer.parseInt(extras.getString("Tab")), displaymetrics));
-//    fill comment list
-    if(treelist.size() > 0){
-    	laList = new LazyBrowseAdapter(this, dbhandle.getCommentList(treelist.get(selectedtree).ID));
-    }else{
-    	laList = new LazyBrowseAdapter(this, new ArrayList<Comment>());
-    }
-    
-//     Assign adapter to ListView
-    commentList.setAdapter(laList);
+//    	fill comment list
+	    if(treelist.size() > 0){
+	    	laList = new LazyBrowseAdapter(this, dbhandle.getCommentList(treelist.get(selectedtree).ID));
+	    }else{
+	    	laList = new LazyBrowseAdapter(this, new ArrayList<Comment>());
+	    }
+	    
+	//     Assign adapter to ListView
+	    commentList.setAdapter(laList);
 	}
 }
