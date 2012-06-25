@@ -20,8 +20,7 @@ import android.view.View;
 	        
 	        Intent intent = new Intent(this, BrowseActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 	        intent.putExtras(getIntent().getExtras());
-	        View view = getLocalActivityManager().startActivity("Browse", intent).getDecorView(); //hier stürzt er ab
-	        System.out.println("main activity 1");
+	        View view = getLocalActivityManager().startActivity("Browse", intent).getDecorView();
 	        replaceView(view);
 	    }
 		

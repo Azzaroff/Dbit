@@ -1,11 +1,11 @@
 package tree.database.data;
 
-import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 import android.graphics.Bitmap;
 
-public class Tree {
+public class Tree  implements Comparable<Tree>{
 
 	public int ID;
 	public String Name;
@@ -44,5 +44,9 @@ public class Tree {
 	public String toString(){
 		return "ID: "+ID+" Name: "+Name+" Age: "+Age+" Size: "+Size+
 				" Date: "+Date+" Lat: "+Location[0]+" Long: "+Location[1];
+	}
+	
+	public int compareTo(Tree another) {
+		return this.Name.compareTo(another.Name);
 	}
 }

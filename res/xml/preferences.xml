@@ -1,10 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <ListPreference
-        android:entryValues="@array/listDistanceValues"
-        android:entries="@array/listDistanceArray"
+    <EditTextPreference
         android:title="Radius"
         android:key="distance"
-        android:summary="Radius to look for trees."
-        android:defaultValue="5"/>
+        android:summary="Radius to look for trees. (km)"
+        android:defaultValue="5"
+        android:enabled="true"
+        android:selectable="true"
+        android:inputType="number"/>
+    <EditTextPreference
+        android:title="Time"
+        android:key="time"
+        android:summary="Time to your last usage. (days)"
+        android:defaultValue="5"
+        android:enabled="true"
+        android:selectable="true"
+        android:inputType="number"/>
 </PreferenceScreen>

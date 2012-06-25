@@ -1,13 +1,24 @@
 package tree.database;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
+import tree.database.data.Tree;
+import tree.database.data.User;
+import tree.database.misc.GpsHandler;
+import tree.database.services.DatabaseHandler;
 import android.app.Activity;
 import android.app.LocalActivityManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.location.Location;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnKeyListener;
 import android.widget.EditText;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
@@ -16,45 +27,26 @@ import android.widget.TextView;
 public class BrowseActivity extends Activity{
 	 
 	private TabHost tabHost;
-	private EditText searchBar;
-	private LocalActivityManager mlam; 
+	private LocalActivityManager mlam;
 	
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
 	    setContentView(R.layout.browse);
 	    mlam = new LocalActivityManager(this, false);
 	    
-	    searchBar = (EditText)findViewById(R.id.browse_search);
 	    
 	    tabHost = (TabHost) findViewById(android.R.id.tabhost);
 	    mlam.dispatchCreate(savedInstanceState);
         tabHost.setup(mlam);
         Bundle extras = getIntent().getExtras();
-//	    TabHost.TabSpec spec;  // Resusable TabSpec for each tab
-//
-//	    Resources res = getResources();
-//
-//	    spec = tabHost.newTabSpec("nearTab")
-//	    				.setIndicator("Near", res.getDrawable(R.drawable.ic_tab_calculate))
-//	    				.setContent(new Intent(this, BrowseTabGroup1Activity.class));
-//	    tabHost.addTab(spec);
-//
-//	    // Do the same for the other tabs
-//	    spec = tabHost.newTabSpec("recentTab").setIndicator("Recent", res.getDrawable(R.drawable.ic_tab_history))
-//	                      .setContent(new Intent(this, BrowseTabGroup2Activity.class));
-//	    tabHost.addTab(spec);
-//
-//	    spec = tabHost.newTabSpec("allTab")
-//	    				.setIndicator("All", res.getDrawable(R.drawable.ic_tab_impress))
-//	    				.setContent(new Intent(this, BrowseTabGroup3Activity.class));
-//	    tabHost.addTab(spec);
+        
 	    
 	    tabHost.getTabWidget().setDividerDrawable(R.drawable.tab_divider);
 	    setupTab(new TextView(this), (String)getText(R.string.nearTabText), new Intent(this, BrowseTabGroup1Activity.class), extras);
 	    setupTab(new TextView(this), (String)getText(R.string.recentTabText), new Intent(this, BrowseTabGroup2Activity.class), extras);
 	    setupTab(new TextView(this), (String)getText(R.string.allTabText), new Intent(this, BrowseTabGroup3Activity.class), extras);
 	    
-	    tabHost.setCurrentTab(0);	    
+	    tabHost.setCurrentTab(0);
 	}
 	
 	public void switchTab(int tabid){
@@ -66,11 +58,6 @@ public class BrowseActivity extends Activity{
 	 @Override
 	    public boolean onKeyDown(int keyCode, KeyEvent event) {
 	        if ((keyCode == KeyEvent.KEYCODE_BACK)) {
-//	            Intent intent = new Intent(getApplicationContext(), OutputActivity.class);
-//	            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//	            View view = TabGroup1Activity.group.getLocalActivityManager().startActivity("Ergebnisse", intent)
-//	                    .getDecorView();
-//	            TabGroup1Activity.group.setContentView(view);
 	        	MainTabGroup1Activity.group.back();
 	        }
 	        return true;

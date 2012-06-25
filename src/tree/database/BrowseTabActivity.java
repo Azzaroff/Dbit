@@ -2,6 +2,7 @@ package tree.database;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -52,7 +53,8 @@ public class BrowseTabActivity extends Activity{
 	private static final int ALLTAB = 2;	
 	
 	private Gallery gallery;
-	
+
+	private EditText searchBar;
 	private TextView nameText;
 	private TextView longitudeText;
 	private TextView latitudeText;
@@ -65,6 +67,7 @@ public class BrowseTabActivity extends Activity{
 	
 	private int selectedtree = 0;
 	private ArrayList<Tree> treelist = new ArrayList<Tree>();
+	private ArrayList<Tree> oldtreelist = new ArrayList<Tree>();
 	
 	/*list adapter for listview*/
 	LazyBrowseAdapter laList = null;
@@ -100,7 +103,7 @@ public class BrowseTabActivity extends Activity{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.browse_tab); 
 		
-		Bundle extras = getIntent().getExtras();
+		final Bundle extras = getIntent().getExtras();
 		dbhandle = new DatabaseHandler();
 		user = extras.getParcelable("UserData");
 		
@@ -114,7 +117,8 @@ public class BrowseTabActivity extends Activity{
 		//get display dimensions
 		displaymetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-		
+        
+        searchBar = (EditText)findViewById(R.id.browse_search);
 		nameText = (TextView)findViewById(R.id.nametext);
 	    longitudeText = (TextView)findViewById(R.id.browse_longtext);
 	    latitudeText = (TextView)findViewById(R.id.browse_lattext);
@@ -207,6 +211,40 @@ public class BrowseTabActivity extends Activity{
 			}
 		});
 	    image_dialog = onCreateDialog(SHOW_PICTURE_DIALOG);
+	    
+	    searchBar.setOnKeyListener(new OnKeyListener() {
+			
+			public boolean onKey(View v, int keyCode, KeyEvent event) {
+				if(searchBar.getText().toString().length() == 0){
+					if(oldtreelist.size() > 0){
+						treelist.clear();
+						treelist.addAll(oldtreelist);
+					}else if(treelist.size()> 0){
+						oldtreelist.addAll(treelist);
+					}
+				}else{
+					ArrayList<Tree> treesSubList = new ArrayList<Tree>();
+					for(Tree t : treelist){
+						if(t.Name.startsWith(searchBar.getText().toString())){
+							treesSubList.add(t);
+						}
+					}
+					Collections.sort(treesSubList);
+					if(oldtreelist.size() == 0)	oldtreelist.addAll(treelist); //store the old treelist
+					treelist.clear();
+					treelist.addAll(treesSubList);
+				}
+				//fill gallery
+				gallery.setAdapter(new ImageAdapter(getParent(), Integer.parseInt(extras.getString("Tab")), displaymetrics, treelist));
+				//fill comment list
+				if(treelist.size() > 0){
+			    	laList = new LazyBrowseAdapter(getParent(), dbhandle.getCommentList(treelist.get(0).ID));
+			    }else{
+			    	laList = new LazyBrowseAdapter(getParent(), new ArrayList<Comment>());
+			    }
+				return false;
+			}
+		});
 	}
 	
 	private void showTreeInfo(int selectedTree){
@@ -306,6 +344,31 @@ public class BrowseTabActivity extends Activity{
 	        	location[1] = (float)currentLocation.getLongitude();
 	        }
 	        treelist = dbhandle.getTreeList(location, prefs.getInt("distance", 5), user, getParent());
+
+			imageList = new ArrayList<Bitmap>();
+	        for(Tree t : treelist){
+	        	for(Bitmap b : t.Images){
+	        		imageList.add(b);
+	        	}
+	        }
+	        //show tree infos
+	        showTreeInfo(0);
+	    }
+	    
+	    public ImageAdapter(Context c, int tabID, DisplayMetrics displaymetrics, ArrayList<Tree> treelist) {
+	        mContext = c;
+	        TypedArray attr = mContext.obtainStyledAttributes(R.styleable.BrowseGallery);
+	        mGalleryItemBackground = attr.getResourceId(
+	                R.styleable.BrowseGallery_android_galleryItemBackground, 0);
+	        attr.recycle();
+	        displaywidth = displaymetrics.widthPixels;
+	        
+	        //get trees from DB
+	        float[] location = new float[2];
+	        if(currentLocation != null){
+	        	location[0] = (float)currentLocation.getLatitude();
+	        	location[1] = (float)currentLocation.getLongitude();
+	        }
 
 			imageList = new ArrayList<Bitmap>();
 	        for(Tree t : treelist){
