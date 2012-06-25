@@ -1,6 +1,5 @@
 package tree.database.misc;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import tree.database.R;
@@ -21,7 +20,7 @@ public class TreelistDialogTreelistAdapter extends BaseAdapter{
 	private Activity activity;
     private ArrayList<Tree> trees;
     private static LayoutInflater inflater=null;
-    private int selectedTree = -1;
+    private Tree selectedTree = null;
     
     public TreelistDialogTreelistAdapter(Activity a, ArrayList<Tree> trees) {
         this.activity = a;
@@ -57,24 +56,21 @@ public class TreelistDialogTreelistAdapter extends BaseAdapter{
     public View getView(int position, View convertView, ViewGroup parent) {
         View vi=convertView;
         if(convertView==null)
-            vi = inflater.inflate(R.layout.my_treelist_item, null);
+            vi = inflater.inflate(R.layout.treelist_dialog_item, null);
 
         Tree tree = trees.get(position);
-        
         TextView nameText=(TextView)vi.findViewById(R.id.treelist_dialog_treelist_nametext);
         ImageView image=(ImageView)vi.findViewById(R.id.treelist_dialog_treelist_picture);
+        CheckBox checkbox = (CheckBox)vi.findViewById(R.id.treelist_dialog_treelist_checkbox);
         
         nameText.setText(tree.Name);
         image.setImageBitmap(tree.Images.get(0));
-        if(position == selectedTree){
-        	CheckBox checkbox = (CheckBox)vi.findViewById(R.id.treelist_dialog_treelist_checkbox);
-            checkbox.setChecked(true);
-        }
+        checkbox.setChecked(tree.equals(selectedTree));
         
         return vi;
     }
     
-    public void setSelectedTree(int selectedTree){
+    public void setSelectedTree(Tree selectedTree){
     	this.selectedTree = selectedTree;
     }
 }

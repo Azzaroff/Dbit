@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-  	<ListPreference  	android:defaultValue="0" 
-  						android:title="Buffer Type" 
-  						android:key="bufferType" 
-  						android:entries="@array/listArray" 
-  						android:entryValues="@array/listValues"/>
-  	<EditTextPreference	android:title="Buffersize"
-                      	android:key="buffersize"
-                      	android:defaultValue="3"></EditTextPreference>
+    <ListPreference
+        android:entryValues="@array/listDistanceValues"
+        android:entries="@array/listDistanceArray"
+        android:title="Radius"
+        android:key="distance"
+        android:summary="Radius to look for trees."
+        android:defaultValue="5"/>
 </PreferenceScreen>

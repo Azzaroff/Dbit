@@ -1,12 +1,16 @@
 <resources>
-<string-array name="listArray">
-    <item>FIFO</item>
-    <item>LRU</item>
-    <item>LFU</item>
+<string-array name="listDistanceArray">
+    <item>1 km</item>
+    <item>3 km</item>
+    <item>5 km</item>
+    <item>7 km</item>
+    <item>15 km</item>
 </string-array>
-<string-array name="listValues">
-    <item>0</item>
+<string-array name="listDistanceValues">
     <item>1</item>
-    <item>2</item>
+    <item>3</item>
+    <item>5</item>
+    <item>7</item>
+    <item>15</item>
 </string-array>
 </resources>

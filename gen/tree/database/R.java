@@ -9,8 +9,8 @@ package tree.database;
 
 public final class R {
     public static final class array {
-        public static final int listArray=0x7f050000;
-        public static final int listValues=0x7f050001;
+        public static final int listDistanceArray=0x7f050000;
+        public static final int listDistanceValues=0x7f050001;
     }
     public static final class attr {
     }

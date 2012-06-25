@@ -9,19 +9,21 @@ import tree.database.data.Comment;
 import tree.database.data.Tree;
 import tree.database.data.User;
 import tree.database.misc.Connectivity;
+import tree.database.misc.GpsHandler;
 import tree.database.misc.LazyBrowseAdapter;
 import tree.database.services.DatabaseHandler;
-import android.R.dimen;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -86,6 +88,12 @@ public class BrowseTabActivity extends Activity{
 	//display metrics
 	DisplayMetrics displaymetrics;
 	
+	//preferences
+	SharedPreferences prefs;
+	
+	//gps infos
+	GpsHandler gpshandle;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -95,9 +103,13 @@ public class BrowseTabActivity extends Activity{
 		Bundle extras = getIntent().getExtras();
 		dbhandle = new DatabaseHandler();
 		user = extras.getParcelable("UserData");
+		
+		//get the preferences
+		prefs = PreferenceManager.getDefaultSharedPreferences(getParent());
 
 		//gets the current location
-		updateLocation();
+		gpshandle = new GpsHandler(getParent());
+		gpshandle.updateLocation();
 		
 		//get display dimensions
 		displaymetrics = new DisplayMetrics();
@@ -293,7 +305,7 @@ public class BrowseTabActivity extends Activity{
 	        	location[0] = (float)currentLocation.getLatitude();
 	        	location[1] = (float)currentLocation.getLongitude();
 	        }
-	        treelist = dbhandle.getTreeList(location, 15, user, getParent());
+	        treelist = dbhandle.getTreeList(location, prefs.getInt("distance", 5), user, getParent());
 
 			imageList = new ArrayList<Bitmap>();
 	        for(Tree t : treelist){
@@ -332,29 +344,6 @@ public class BrowseTabActivity extends Activity{
 	        return imageView;
 	    }
 	}
-	
-	/**
-     * sets the map to the current location
-     */
-    private void updateLocation(){
-    	
-    	boolean gps_enabled = false;
-    	boolean network_enabled = false;
-
-    	locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-    	
-    	try{gps_enabled=locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);}catch(Exception ex){}
-        try{network_enabled=locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);}catch(Exception ex){}
-        
-        if(gps_enabled){
-        	locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, updatehandler);
-        	currentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        }
-        if(network_enabled){
-        	locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, updatehandler);
-        	currentLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        }
-    }
 	
 	public class GeoUpdateHandler implements LocationListener {
 
@@ -414,5 +403,15 @@ public class BrowseTabActivity extends Activity{
 	    
 	//     Assign adapter to ListView
 	    commentList.setAdapter(laList);
+	}
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		Log.i(this.getClass().getSimpleName(), keyCode+"");
+		if(keyCode == 82){ //menu key
+			
+			startActivity(new Intent(getParent(), Preferences.class));
+		}
+		return super.onKeyDown(keyCode, event);
 	}
 }

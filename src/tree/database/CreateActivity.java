@@ -14,6 +14,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -22,6 +23,7 @@ import android.location.Location;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -69,6 +71,8 @@ public class CreateActivity extends Activity{
 	private Tree selectedTree = null;
 	private Tree localSelectedTree = null;
 	
+	private SharedPreferences prefs;
+	
 	//camera intent stuff
 	Uri imageUri;
 	
@@ -79,6 +83,8 @@ public class CreateActivity extends Activity{
 		setContentView(R.layout.create_tree);
 		
 		Bundle extras = getIntent().getExtras();
+		
+		prefs = PreferenceManager.getDefaultSharedPreferences(getParent());
 		
 		user = extras.getParcelable("UserData");
 
@@ -92,6 +98,7 @@ public class CreateActivity extends Activity{
 		locationButton = (ToggleButton) findViewById(R.id.locationToggle);
 		createButton = (Button) findViewById(R.id.create_tree_create_button);
 		selectButton = (Button) findViewById(R.id.create_tree_select_button);
+		selectButton.setEnabled(false);
 		
 		addCheckBox = (CheckBox) findViewById(R.id.create_tree_checkbox);
 		
@@ -200,7 +207,8 @@ public class CreateActivity extends Activity{
 				nameText.setEnabled(isChecked);
 				ageText.setEnabled(isChecked);
 				sizeText.setEnabled(isChecked);
-				selectButton.setEnabled(isChecked);
+				selectButton.setEnabled(!isChecked);
+				locationButton.setEnabled(isChecked);
 				if(isChecked){ //add new tree
 					if(selectedTree != null){
 						nameText.setText("");
@@ -220,6 +228,14 @@ public class CreateActivity extends Activity{
 						}
 					}
 				}
+			}
+		});
+		
+		addCheckBox.setOnClickListener(new OnClickListener() {
+			
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Log.i(this.getClass().getSimpleName(), "checkbox");
 			}
 		});
 		
@@ -338,13 +354,19 @@ public class CreateActivity extends Activity{
 //		super.onPrepareDialog(id, dialog);
 		switch(id){
 			case SHOW_TREELIST_DIALOG:{
-				ListView treelistview = (ListView) dialog.findViewById(R.id.treelist_dialog_TreeList);
+				final ListView treelistview = (ListView) dialog.findViewById(R.id.treelist_dialog_TreeList);
 				//get treelist
 				Location l = gpshandle.updateLocation();
-				float loc[] = {(float)l.getLatitude(), (float)l.getLongitude()};
-				final ArrayList<Tree> trees = dbhandle.getTreeList(loc, 15, user, getParent());
+				float loc[] = new float[2];
+				if(l != null){
+					loc[0] = (float)l.getLatitude();
+					loc[1] = (float)l.getLongitude();
+				}
+				final ArrayList<Tree> trees = dbhandle.getTreeList(loc, prefs.getInt("distance", 5), user, getParent());
 				//set treelist adapter
 				final TreelistDialogTreelistAdapter tdtaList = new TreelistDialogTreelistAdapter(this, trees);
+				if(selectedTree != null) tdtaList.setSelectedTree(selectedTree);
+				treelistview.setAdapter(tdtaList);
 				
 				//set treelist clicklistener
 				treelistview.setOnItemClickListener(new OnItemClickListener() {
@@ -352,8 +374,9 @@ public class CreateActivity extends Activity{
 					public void onItemClick(AdapterView<?> parent, View view, int position,
 							long ID) {
 						// TODO Auto-generated method stub
-						tdtaList.setSelectedTree((int)ID);
 						localSelectedTree = trees.get((int)ID);
+						tdtaList.setSelectedTree(localSelectedTree);
+						tdtaList.notifyDataSetChanged();
 					}
 				});
 				
@@ -362,11 +385,16 @@ public class CreateActivity extends Activity{
 				// if button is clicked, close the custom dialog
 				okButton.setOnClickListener(new OnClickListener() {
 					public void onClick(View v) {
-						selectedTree = localSelectedTree;
-						nameText.setText(selectedTree.Name);
-						sizeText.setText(""+selectedTree.Size);
-						ageText.setText(""+selectedTree.Age);
-						dialog.dismiss();
+						if(localSelectedTree != null){
+							selectedTree = localSelectedTree;
+							nameText.setText(selectedTree.Name);
+							sizeText.setText(""+selectedTree.Size);
+							ageText.setText(""+selectedTree.Age);
+							dialog.dismiss();
+						}else{
+							Toast toast = Toast.makeText(getParent(), getText(R.string.tree_selection_error), Toast.LENGTH_LONG);
+							toast.show();
+						}
 					}
 				});
 				
