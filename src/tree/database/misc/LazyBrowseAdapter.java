@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import tree.database.R;
 import tree.database.data.Comment;
+import tree.database.data.User;
 import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -20,14 +21,19 @@ public class LazyBrowseAdapter extends BaseAdapter {
     private ArrayList<Comment> comments;
     private static LayoutInflater inflater=null;
     
-    public LazyBrowseAdapter(Activity a, ArrayList<Comment> comments) {
+    public LazyBrowseAdapter(Activity a, ArrayList<Comment> comments, User user) {
         this.activity = a;
         this.comments = comments;
         this.inflater = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         
-        if(this.comments.size() <= 0){
+        if(this.comments.size() <= 0 && user.Rights >= User.READ_COMMENTS){
         	Comment c = new Comment();
         	c.Content = (String) activity.getText(R.string.empty_comment);
+        	this.comments.add(c);
+        }else if(user.Rights < User.READ_COMMENTS){
+        	this.comments.clear();
+        	Comment c = new Comment();
+        	c.Content = (String) activity.getText(R.string.no_rights_comment_read);
         	this.comments.add(c);
         }
     }

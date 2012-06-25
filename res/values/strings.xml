@@ -41,6 +41,7 @@
     <string name="pwdFailure">Please fill in your password.</string>
     <string name="avatarFailure">Please add an avatar.</string>
     <string name="miscFailure">An unknown failure ocurred.</string>
+    <string name="no_tree">There is no tree in DB.</string>
     
     <string name="change_Title">Change password</string>
     <string name="oldPwd">old password:</string>
@@ -85,4 +86,7 @@
     
     <string name="treelist_dialog_title">Select tree to add picture.</string>
     <string name="tree_selection_error">Please select the tree you want to add a picture.</string>
+    
+    <string name="no_rights_comment_read">You need at least 10 Photos to read comments.</string>
+     <string name="no_rights_comment_write">You need at least 15 Photos to read comments.</string>
 </resources>

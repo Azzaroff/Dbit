@@ -20,6 +20,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -150,7 +151,7 @@ public class BrowseTabActivity extends Activity{
 	            selectedtree = getSelectedTree(position);
 	            
 	           showTreeInfo(position);
-	           laList = new LazyBrowseAdapter(getParent(), dbhandle.getCommentList(treelist.get(position).ID));
+	           laList = new LazyBrowseAdapter(getParent(), dbhandle.getCommentList(treelist.get(position).ID), user);
 	           commentList.setAdapter(laList);
 	        }
 	    });
@@ -194,15 +195,24 @@ public class BrowseTabActivity extends Activity{
 	    addComment.setOnKeyListener(new OnKeyListener() {
 			public boolean onKey(View v, int keyCode, KeyEvent event) {
 				if(keyCode == 66){
-					if(saveComment()){
+					if(user.Rights >= User.READ_WRITE_COMMENTS){
+						if(saveComment()){
+							addComment.setText("");
+							addComment.clearFocus();
+							InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+							imm.hideSoftInputFromWindow(addComment.getWindowToken(), 0);
+							laList = new LazyBrowseAdapter(getParent(), dbhandle.getCommentList(treelist.get(selectedtree).ID), user);
+					        commentList.setAdapter(laList);
+						}else{
+							Toast toast = Toast.makeText(getParent(), getParent().getText(R.string.db_error), Toast.LENGTH_LONG);
+							toast.show();
+						}
+					}else{
 						addComment.setText("");
 						addComment.clearFocus();
 						InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 						imm.hideSoftInputFromWindow(addComment.getWindowToken(), 0);
-						laList = new LazyBrowseAdapter(getParent(), dbhandle.getCommentList(treelist.get(selectedtree).ID));
-				        commentList.setAdapter(laList);
-					}else{
-						Toast toast = Toast.makeText(getParent(), getParent().getText(R.string.db_error), Toast.LENGTH_LONG);
+						Toast toast = Toast.makeText(getParent(), getParent().getText(R.string.no_rights_comment_write), Toast.LENGTH_LONG);
 						toast.show();
 					}
 					
@@ -238,9 +248,9 @@ public class BrowseTabActivity extends Activity{
 				gallery.setAdapter(new ImageAdapter(getParent(), Integer.parseInt(extras.getString("Tab")), displaymetrics, treelist));
 				//fill comment list
 				if(treelist.size() > 0){
-			    	laList = new LazyBrowseAdapter(getParent(), dbhandle.getCommentList(treelist.get(0).ID));
+			    	laList = new LazyBrowseAdapter(getParent(), dbhandle.getCommentList(treelist.get(0).ID), user);
 			    }else{
-			    	laList = new LazyBrowseAdapter(getParent(), new ArrayList<Comment>());
+			    	laList = new LazyBrowseAdapter(getParent(), new ArrayList<Comment>(), user);
 			    }
 				return false;
 			}
@@ -267,7 +277,7 @@ public class BrowseTabActivity extends Activity{
         if(tree.Comments == null){
         	tree.Comments = dbhandle.getCommentList(tree.ID);
         }
-        laList = new LazyBrowseAdapter(getParent(), tree.Comments);
+        laList = new LazyBrowseAdapter(getParent(), tree.Comments, user);
         commentList.setAdapter(laList);
 //	    Utilities.setListViewHeightBasedOnChildren(commentList);
 	}
@@ -345,6 +355,14 @@ public class BrowseTabActivity extends Activity{
 	        }
 	        treelist = dbhandle.getTreeList(location, prefs.getInt("distance", 5), user, getParent(), prefs.getInt("time", 5));
 
+	        //if there are no trees, a dummy tree will be inserted
+	        if(treelist.size() == 0){
+	        	Tree t = new Tree(0, getText(R.string.no_tree).toString(), 0, 0.0, new Double[]{0.0,0.0},
+	        			new java.sql.Timestamp((new Date()).getTime()));
+	        	t.Images.add(BitmapFactory.decodeResource(getResources(), R.drawable.baum));
+	        	treelist.add(t);
+	        }
+	        
 			imageList = new ArrayList<Bitmap>();
 	        for(Tree t : treelist){
 	        	for(Bitmap b : t.Images){
@@ -459,9 +477,9 @@ public class BrowseTabActivity extends Activity{
 		gallery.setAdapter(new ImageAdapter(this, Integer.parseInt(extras.getString("Tab")), displaymetrics));
 //    	fill comment list
 	    if(treelist.size() > 0){
-	    	laList = new LazyBrowseAdapter(this, dbhandle.getCommentList(treelist.get(selectedtree).ID));
+	    	laList = new LazyBrowseAdapter(this, dbhandle.getCommentList(treelist.get(selectedtree).ID), user);
 	    }else{
-	    	laList = new LazyBrowseAdapter(this, new ArrayList<Comment>());
+	    	laList = new LazyBrowseAdapter(this, new ArrayList<Comment>(), user);
 	    }
 	    
 	//     Assign adapter to ListView

@@ -88,7 +88,7 @@ public class DatabaseHandler{
 				}
 				rs.close();
 				ps.close();
-			}			
+			}
 			//check, if the statement changes DB entries
 			conn.close();
 			for(Tree t : tempmap.values()){
