@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.TreeMap;
 
 import tree.database.R;
 import tree.database.SettingsActivity;
@@ -29,7 +30,7 @@ public class DatabaseHandler{
 	private Connection connection;
 	private static String URL = "jdbc:postgresql://seclab10.medien.uni-weimar.de/baumdb?user=worker&password=mindless&ssl=true&sslfactory=org.postgresql.ssl.NonValidatingFactory";
 	
-	public ArrayList<Tree> getTreeList(float[] userlocation, double radius, User user, Activity activity){
+	public ArrayList<Tree> getTreeList(float[] userlocation, float radius, User user, Activity activity, int time_since_last_usage){
 		ResultSet rs;
 		
     	try {
@@ -37,9 +38,21 @@ public class DatabaseHandler{
 			Class.forName("org.postgresql.Driver");
 			Connection conn = DriverManager.getConnection(URL);
 			
+			//calculate radius
+			float distance_in_minutes = (float) (radius / 1.852);
+			
 			PreparedStatement ps;
 			
 			ps = conn.prepareStatement("SELECT tid, long, lat, date, size, age, name FROM trees;");
+			
+			//for radius treelist
+			if(radius > 0.0f){
+				ps = conn.prepareStatement("SELECT tid, long, lat, date, size, age, name FROM trees WHERE (@(? - long) < ?) AND (@(? - lat) < ?);");
+				ps.setFloat(1, userlocation[1]);
+				ps.setFloat(2, distance_in_minutes);
+				ps.setFloat(3, userlocation[0]);
+				ps.setFloat(4, distance_in_minutes);
+			}
 			
 			//for settings treelist
 			if(userlocation == null && activity.getClass().getSimpleName().equals(SettingsActivity.class.getSimpleName())){
@@ -64,7 +77,7 @@ public class DatabaseHandler{
 			rs.close();
 			ps.close();
 			//get pictures if the rights are enought
-			if(user.Rights >= User.SHOW_PICTURES){
+			if(user.Rights >= User.SHOW_PICTURES && tempmap.size() > 0){
 				Log.i(this.getClass().getSimpleName(), "get pictures from database");
 				ps = conn.prepareStatement("SELECT tree_has_picture.tid, images.img_thumb FROM tree_has_picture INNER JOIN images ON tree_has_picture.pid = images.pid;");
 				rs = ps.executeQuery();

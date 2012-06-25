@@ -9,9 +9,11 @@ import tree.database.misc.SettingsTreelistAdapter;
 import tree.database.services.DatabaseHandler;
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -33,6 +35,8 @@ public class SettingsActivity extends Activity{
 	private User user;
 	
 	private DatabaseHandler dbhandle;
+	
+	private SharedPreferences prefs;
 	
 	//treelist
 	private ListView myTreeListView;
@@ -60,6 +64,8 @@ public class SettingsActivity extends Activity{
 		setContentView(R.layout.settings);
 		
 		Bundle extras = getIntent().getExtras();
+		
+		prefs = PreferenceManager.getDefaultSharedPreferences(getParent());
 		
 		dbhandle = new DatabaseHandler();
 		user = extras.getParcelable("UserData");
@@ -97,7 +103,7 @@ public class SettingsActivity extends Activity{
 		groupListView.setScrollbarFadingEnabled(true);
 		
 		//fill treelist
-		taList = new SettingsTreelistAdapter(this, dbhandle.getTreeList(null, 0.0 , user, this));
+		taList = new SettingsTreelistAdapter(this, dbhandle.getTreeList(null, -1.0f , user, this, prefs.getInt("time", 5)));
 		myTreeListView.setAdapter(taList);
 		myTreeListView.setScrollbarFadingEnabled(true);
 		

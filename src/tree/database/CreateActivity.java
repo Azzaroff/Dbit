@@ -362,7 +362,7 @@ public class CreateActivity extends Activity{
 					loc[0] = (float)l.getLatitude();
 					loc[1] = (float)l.getLongitude();
 				}
-				final ArrayList<Tree> trees = dbhandle.getTreeList(loc, prefs.getInt("distance", 5), user, getParent());
+				final ArrayList<Tree> trees = dbhandle.getTreeList(loc, prefs.getInt("distance", 5), user, getParent(), prefs.getInt("time", 5));
 				//set treelist adapter
 				final TreelistDialogTreelistAdapter tdtaList = new TreelistDialogTreelistAdapter(this, trees);
 				if(selectedTree != null) tdtaList.setSelectedTree(selectedTree);

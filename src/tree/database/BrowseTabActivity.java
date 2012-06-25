@@ -343,7 +343,7 @@ public class BrowseTabActivity extends Activity{
 	        	location[0] = (float)currentLocation.getLatitude();
 	        	location[1] = (float)currentLocation.getLongitude();
 	        }
-	        treelist = dbhandle.getTreeList(location, prefs.getInt("distance", 5), user, getParent());
+	        treelist = dbhandle.getTreeList(location, prefs.getInt("distance", 5), user, getParent(), prefs.getInt("time", 5));
 
 			imageList = new ArrayList<Bitmap>();
 	        for(Tree t : treelist){
