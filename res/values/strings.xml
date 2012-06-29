@@ -89,4 +89,7 @@
     
     <string name="no_rights_comment_read">You need at least 10 Photos to read comments.</string>
      <string name="no_rights_comment_write">You need at least 15 Photos to read comments.</string>
+     
+     <string name="delete_user_text">Do you really want to delete this user? All data associated with this account will be deleted.</string>
+     <string name="delete_user_title">Delete User</string>
 </resources>

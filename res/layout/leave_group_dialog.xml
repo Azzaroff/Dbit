@@ -14,16 +14,21 @@
 	    android:layout_width="fill_parent"
 	    android:layout_height="wrap_content"
 	    android:orientation="horizontal"
+	    android:weightSum="1.0"
     >
     	<Button 
     		android:layout_width="fill_parent"
 	    	android:layout_height="wrap_content"
 	    	android:id="@+id/leave_group_ok_button"
-	    	android:text="@string/ok_button"/>
+	    	android:text="@string/ok_button"
+	    	android:layout_weight=".50"
+	    	/>
     	<Button 
     		android:layout_width="fill_parent"
 	    	android:layout_height="wrap_content"
 	    	android:id="@+id/leave_group_cancel_button"
-	    	android:text="@string/cancel_button"/>
+	    	android:text="@string/cancel_button"
+	    	android:layout_weight=".50"
+	    	/>
     </LinearLayout>
 </LinearLayout>

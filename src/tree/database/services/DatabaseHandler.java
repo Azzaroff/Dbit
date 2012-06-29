@@ -829,6 +829,28 @@ public class DatabaseHandler{
 		return new ArrayList<Comment>();
 	}
 	
+	public boolean deleteUser(int userID){
+		try {
+			Class.forName("org.postgresql.Driver");
+			Connection conn = DriverManager.getConnection(URL);
+			
+			PreparedStatement ps = conn.prepareStatement("DELETE FROM users WHERE uid = ?;");
+			ps.setInt(1, userID);
+			
+			if(ps.executeUpdate() >= 1){
+				Log.i(this.getClass().getSimpleName(), "Remove user from users: success");
+				return true;
+			}
+			
+			ps.close();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+    	return false;
+	}
+	
 	private Connection connectionHandler(Context context) throws SQLException{
 		if(Connectivity.isConnected(context)){
 			return DriverManager.getConnection(URL);

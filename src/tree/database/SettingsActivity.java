@@ -51,10 +51,12 @@ public class SettingsActivity extends Activity{
 	private static final int SHOW_CREATE_GROUP_DIALOG = 1;
 	private static final int SHOW_JOIN_GROUP_DIALOG = 2;
 	private static final int SHOW_LEAVE_GROUP_DIALOG = 3;
+	private static final int SHOW_DELETE_USER_DIALOG = 4;
 	private Dialog change_pwd_dialog;
 	private Dialog create_group_dialog;
 	private Dialog join_group_dialog;
 	private Dialog leave_group_dialog;
+	private Dialog delete_user_dialog;
 	private Group selectedgroup;
 	
 	@Override
@@ -95,6 +97,15 @@ public class SettingsActivity extends Activity{
 				change_pwd_dialog = onCreateDialog(SHOW_CHANGE_PWD_DIALOG);
 				onPrepareDialog(SHOW_CHANGE_PWD_DIALOG, change_pwd_dialog);
 				showDialog(SHOW_CHANGE_PWD_DIALOG, change_pwd_dialog);
+			}
+		});
+		
+		deleteButton.setOnClickListener(new OnClickListener() {
+			
+			public void onClick(View v) {
+				delete_user_dialog = onCreateDialog(SHOW_DELETE_USER_DIALOG);
+				onPrepareDialog(SHOW_DELETE_USER_DIALOG, delete_user_dialog);
+				showDialog(SHOW_DELETE_USER_DIALOG, delete_user_dialog);
 			}
 		});
 		
@@ -158,6 +169,11 @@ public class SettingsActivity extends Activity{
 		case SHOW_LEAVE_GROUP_DIALOG:{
 			dialog = new Dialog(getParent());
 			dialog.setContentView(R.layout.leave_group_dialog);
+			return dialog;
+		}
+		case SHOW_DELETE_USER_DIALOG:{
+			dialog = new Dialog(getParent());
+			dialog.setContentView(R.layout.delete_user_dialog);
 			return dialog;
 		}
 		}
@@ -295,6 +311,29 @@ public class SettingsActivity extends Activity{
 				});
 				break;
 			}
+			case SHOW_DELETE_USER_DIALOG:{
+				dialog.setTitle(getText(R.string.delete_user_title));
+				final Button delete_button = (Button)dialog.findViewById(R.id.delete_user_ok_button);
+				final Button cancel_button = (Button)dialog.findViewById(R.id.delete_user_cancel_button);
+				
+				cancel_button.setOnClickListener(new OnClickListener() {
+					public void onClick(View v) {
+						dialog.dismiss();
+					}
+				});
+				
+				delete_button.setOnClickListener(new OnClickListener() {
+					public void onClick(View v) {
+						if(!dbhandle.deleteUser(user.ID)){
+							Toast toast = Toast.makeText(getParent(), getText(R.string.db_error), Toast.LENGTH_LONG);
+							toast.show();
+						}else{
+							dialog.dismiss();
+						}
+					}
+				});
+				break;
+			}
 		}
 		
 	}
@@ -310,6 +349,9 @@ public class SettingsActivity extends Activity{
 				dialog.show();
 			}
 			case SHOW_LEAVE_GROUP_DIALOG:{
+				dialog.show();
+			}
+			case SHOW_DELETE_USER_DIALOG:{
 				dialog.show();
 			}
 		}
