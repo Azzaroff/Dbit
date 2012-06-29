@@ -67,6 +67,7 @@ public class BrowseTabActivity extends Activity{
 	private DatabaseHandler dbhandle;
 	
 	private int selectedtree = 0;
+	private int selectedImage = 0;
 	private ArrayList<Tree> treelist = new ArrayList<Tree>();
 	private ArrayList<Tree> oldtreelist = new ArrayList<Tree>();
 	
@@ -149,9 +150,10 @@ public class BrowseTabActivity extends Activity{
 	            Toast.makeText(BrowseTabActivity.this, "" + position, Toast.LENGTH_SHORT).show();
 	            
 	            selectedtree = getSelectedTree(position);
+	            selectedImage = getSelectedImage(position);
 	            
-	           showTreeInfo(position);
-	           laList = new LazyBrowseAdapter(getParent(), dbhandle.getCommentList(treelist.get(position).ID), user);
+	           showTreeInfo(selectedtree);
+	           laList = new LazyBrowseAdapter(getParent(), dbhandle.getCommentList(treelist.get(selectedtree).ID), user);
 	           commentList.setAdapter(laList);
 	        }
 	    });
@@ -164,11 +166,11 @@ public class BrowseTabActivity extends Activity{
 				//prepare dialog
 				image_dialog.setTitle(treelist.get(selectedtree).Name);
 				//get the right picture to show
-				Bitmap high_res_image = dbhandle.getHighResPicture(treelist.get(selectedtree).ID, getSelectedTreeImage(gallery.getSelectedItemPosition()), Connectivity.getConnectionSpeed(getParent()));
+				Bitmap high_res_image = dbhandle.getHighResPicture(treelist.get(selectedtree).ID, getSelectedTree(gallery.getSelectedItemPosition()), Connectivity.getConnectionSpeed(getParent()));
 				if(high_res_image != null){
 					image_dialog_image.setImageBitmap(high_res_image);
 				}else{
-					image_dialog_image.setImageBitmap(treelist.get(selectedtree).Images.get(getSelectedTreeImage(gallery.getSelectedItemPosition())));
+					image_dialog_image.setImageBitmap(treelist.get(selectedtree).Images.get(getSelectedTree(gallery.getSelectedItemPosition())));
 				}
 				//show dialog
 				image_dialog.show();
@@ -181,8 +183,9 @@ public class BrowseTabActivity extends Activity{
 
 			public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
 					int arg2, long arg3) {
-				Toast toast = Toast.makeText(getParent(), "long item click - do something useful here", Toast.LENGTH_LONG);
-				toast.show();
+				
+				selectedtree = getSelectedTree(arg2);
+				selectedImage = getSelectedImage(arg2);
 				//debug
 				Log.i(this.getClass().getSimpleName(), "long click");
 				onPrepareDialog(SHOW_PICTURE_DIALOG, image_dialog);
@@ -308,9 +311,9 @@ public class BrowseTabActivity extends Activity{
 		super.onPrepareDialog(id, dialog);
 		switch(id){
 			case SHOW_PICTURE_DIALOG:{
-				dialog.setTitle(treelist.get((int)gallery.getSelectedItemId()).Name);
+				dialog.setTitle(treelist.get(selectedtree).Name);
 				ImageView dialog_image = (ImageView) dialog.findViewById(R.id.picture_dialog_image);
-				dialog_image.setImageBitmap(Bitmap.createScaledBitmap(treelist.get((int)gallery.getSelectedItemId()).Images.get(0), (int)(displaymetrics.widthPixels*0.9f), (int)(displaymetrics.widthPixels*0.9)/3*4, true));
+				dialog_image.setImageBitmap(Bitmap.createScaledBitmap(treelist.get(selectedtree).Images.get(selectedImage), (int)(displaymetrics.widthPixels*0.9f), (int)(displaymetrics.widthPixels*0.9)/3*4, true));
 				dialog_image.setScaleType(ImageView.ScaleType.FIT_XY);
 				break;
 			}
@@ -353,7 +356,14 @@ public class BrowseTabActivity extends Activity{
 	        	location[0] = (float)currentLocation.getLatitude();
 	        	location[1] = (float)currentLocation.getLongitude();
 	        }
-	        treelist = dbhandle.getTreeList(location, prefs.getInt("distance", 5), user, getParent(), prefs.getInt("time", 5));
+	        if(tabID == 0){
+	        	treelist = dbhandle.getTreeList(location, prefs.getInt("distance", 5), user, getParent(), prefs.getInt("time", 5));
+	        }else if(tabID == 1){
+	        	treelist = dbhandle.getTreeList(location, prefs.getInt("distance", 5), user, getParent(), prefs.getInt("time", 5));
+	        }else{
+	        	treelist = dbhandle.getTreeList(location, Float.MAX_VALUE, user, getParent(), prefs.getInt("time", 5));
+	        }
+	        
 
 	        //if there are no trees, a dummy tree will be inserted
 	        if(treelist.size() == 0){
@@ -386,6 +396,15 @@ public class BrowseTabActivity extends Activity{
 	        if(currentLocation != null){
 	        	location[0] = (float)currentLocation.getLatitude();
 	        	location[1] = (float)currentLocation.getLongitude();
+	        }
+	        treelist = dbhandle.getTreeList(location, prefs.getInt("distance", 5), user, getParent(), prefs.getInt("time", 5));
+
+	        //if there are no trees, a dummy tree will be inserted
+	        if(treelist.size() == 0){
+	        	Tree t = new Tree(0, getText(R.string.no_tree).toString(), 0, 0.0, new Double[]{0.0,0.0},
+	        			new java.sql.Timestamp((new Date()).getTime()));
+	        	t.Images.add(BitmapFactory.decodeResource(getResources(), R.drawable.baum));
+	        	treelist.add(t);
 	        }
 
 			imageList = new ArrayList<Bitmap>();
@@ -447,22 +466,22 @@ public class BrowseTabActivity extends Activity{
 	protected int getSelectedTree(int selectedItem){
 		int selectedTree = 0;
 		for(Tree t : treelist){
-			if(t.Images.size() < selectedItem){
-				return selectedTree;
-			}else{
+			if(t.Images.size() <= selectedItem){
 				selectedItem -= t.Images.size();
 				selectedTree++;
+			}else{
+				return selectedTree;
 			}
 		}
 		return -1;
 	}
 	
-	protected int getSelectedTreeImage(int selectedItem){
+	protected int getSelectedImage(int selectedItem){
 		for(Tree t : treelist){
-			if(t.Images.size() < selectedItem){
-				return selectedItem;
-			}else{
+			if(t.Images.size() <= selectedItem){
 				selectedItem -= t.Images.size();
+			}else{
+				return selectedItem;
 			}
 		}
 		return -1;

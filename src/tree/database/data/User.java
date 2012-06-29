@@ -12,7 +12,7 @@ import android.util.Log;
 
 public class User implements Parcelable {
 	
-	public static final int INITIAL_RIGHT = 0;
+	public static final int INITIAL_RIGHT = 0; 
 	public static final int SHOW_PICTURES = 1;
 	public static final int READ_COMMENTS = 2;
 	public static final int READ_WRITE_COMMENTS = 3;

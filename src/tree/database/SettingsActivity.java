@@ -102,9 +102,6 @@ public class SettingsActivity extends Activity{
 		fillGroupList();
 		groupListView.setScrollbarFadingEnabled(true);
 		
-		//fill treelist
-		taList = new SettingsTreelistAdapter(this, dbhandle.getTreeList(null, -1.0f , user, this, prefs.getInt("time", 5)));
-		myTreeListView.setAdapter(taList);
 		myTreeListView.setScrollbarFadingEnabled(true);
 		
 		groupListView.setOnItemClickListener(new OnItemClickListener() {
@@ -322,5 +319,14 @@ public class SettingsActivity extends Activity{
 		groups = dbhandle.getGroupList(user.ID);
 		gaList = new GrouplistAdapter(this, groups, user);
 		groupListView.setAdapter(gaList);
+	}
+	
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+		//fill treelist
+		taList = new SettingsTreelistAdapter(this, dbhandle.getUsersTreeList(user, this));
+		myTreeListView.setAdapter(taList);	
 	}
 }
