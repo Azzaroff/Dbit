@@ -26,6 +26,8 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -225,9 +227,9 @@ public class BrowseTabActivity extends Activity{
 		});
 	    image_dialog = onCreateDialog(SHOW_PICTURE_DIALOG);
 	    
-	    searchBar.setOnKeyListener(new OnKeyListener() {
+	    searchBar.addTextChangedListener(new TextWatcher() {
 			
-			public boolean onKey(View v, int keyCode, KeyEvent event) {
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				if(searchBar.getText().toString().length() == 0){
 					if(oldtreelist.size() > 0){
 						treelist.clear();
@@ -240,6 +242,7 @@ public class BrowseTabActivity extends Activity{
 					for(Tree t : treelist){
 						if(t.Name.startsWith(searchBar.getText().toString())){
 							treesSubList.add(t);
+							Log.i(getClass().getSimpleName(), ""+treesSubList.size());
 						}
 					}
 					Collections.sort(treesSubList);
@@ -255,7 +258,17 @@ public class BrowseTabActivity extends Activity{
 			    }else{
 			    	laList = new LazyBrowseAdapter(getParent(), new ArrayList<Comment>(), user);
 			    }
-				return false;
+			}
+			
+			public void beforeTextChanged(CharSequence s, int start, int count,
+					int after) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			public void afterTextChanged(Editable s) {
+				// TODO Auto-generated method stub
+				
 			}
 		});
 	}
@@ -397,7 +410,7 @@ public class BrowseTabActivity extends Activity{
 	        	location[0] = (float)currentLocation.getLatitude();
 	        	location[1] = (float)currentLocation.getLongitude();
 	        }
-	        treelist = dbhandle.getTreeList(location, prefs.getInt("distance", 5), user, getParent(), prefs.getInt("time", 5));
+//	        treelist = dbhandle.getTreeList(location, prefs.getInt("distance", 5), user, getParent(), prefs.getInt("time", 5));
 
 	        //if there are no trees, a dummy tree will be inserted
 	        if(treelist.size() == 0){
@@ -503,15 +516,16 @@ public class BrowseTabActivity extends Activity{
 	    
 	//     Assign adapter to ListView
 	    commentList.setAdapter(laList);
+	    searchBar = (EditText)findViewById(R.id.browse_search);
 	}
 	
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		Log.i(this.getClass().getSimpleName(), keyCode+"");
 		if(keyCode == 82){ //menu key
-			
 			startActivity(new Intent(getParent(), Preferences.class));
 		}
 		return super.onKeyDown(keyCode, event);
 	}
+	
 }
