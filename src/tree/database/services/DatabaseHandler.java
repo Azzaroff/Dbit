@@ -841,12 +841,12 @@ public class DatabaseHandler{
 														 "COMMIT;");
 			ps.setInt(1, userID);
 			
-			if(ps.executeUpdate() >= 1){
-				Log.i(this.getClass().getSimpleName(), "Remove user Transaction: success");
-				return true;
-			}
+			//gibt immer 0 zurück
+			Log.i(this.getClass().getSimpleName(), "Execute Update Delete User: "+ps.executeUpdate());
+			Log.i(this.getClass().getSimpleName(), "Remove user Transaction: success");
 			
 			ps.close();
+			return true;	
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (SQLException e) {

@@ -331,6 +331,7 @@ public class SettingsActivity extends Activity{
 							toast.show();
 						}else{
 							dialog.dismiss();
+							finish();
 						}
 					}
 				});
