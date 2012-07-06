@@ -834,15 +834,19 @@ public class DatabaseHandler{
 			Class.forName("org.postgresql.Driver");
 			Connection conn = DriverManager.getConnection(URL);
 			
-			PreparedStatement ps = conn.prepareStatement("DELETE FROM users WHERE uid = ?;");
+			PreparedStatement ps = conn.prepareStatement("BEGIN; " +
+														 "DELETE FROM users WHERE uid = ?; " +
+														 "DELETE FROM images WHERE pid NOT IN (select pid from user_took_picture); " +
+														 "DELETE FROM trees WHERE tid NOT IN (select tid from tree_has_picture); " +
+														 "COMMIT;");
 			ps.setInt(1, userID);
 			
-			if(ps.executeUpdate() >= 1){
-				Log.i(this.getClass().getSimpleName(), "Remove user from users: success");
-				return true;
-			}
+			//gibt immer 0 zurück
+			Log.i(this.getClass().getSimpleName(), "Execute Update Delete User: "+ps.executeUpdate());
+			Log.i(this.getClass().getSimpleName(), "Remove user Transaction: success");
 			
 			ps.close();
+			return true;	
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (SQLException e) {
