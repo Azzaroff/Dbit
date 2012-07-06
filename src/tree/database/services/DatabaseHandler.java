@@ -458,6 +458,11 @@ public class DatabaseHandler{
 			
 			if(ps.executeUpdate() >= 1){
 				Log.i(this.getClass().getSimpleName(), "Add UserImageRelation pid:"+ pid + " uid:"+uid);
+				//increase user rights
+				ps = conn.prepareStatement("select updateRights(?);");
+				ps.setInt(1, uid);
+				ps.executeUpdate();
+				ps.close();
 				return true;
 			}
 			ps.close();
