@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -143,7 +144,9 @@ public class SettingsActivity extends Activity{
 	}
 	
 	private void setPicture(Bitmap thumbnail){
-		avatarPicture.setImageBitmap(thumbnail.createScaledBitmap(thumbnail, getWindowManager().getDefaultDisplay().getWidth()/2, getWindowManager().getDefaultDisplay().getWidth()/8*3, true));
+		Matrix matrix = new Matrix();
+//		matrix.preRotate(90);
+		avatarPicture.setImageBitmap(Bitmap.createBitmap(Bitmap.createScaledBitmap(thumbnail, getWindowManager().getDefaultDisplay().getWidth()/8*3, getWindowManager().getDefaultDisplay().getWidth()/2, true), 0, 0, getWindowManager().getDefaultDisplay().getWidth()/8*3, getWindowManager().getDefaultDisplay().getWidth()/2, matrix, true));
 	}
 	
 	public Dialog onCreateDialog(int id){
@@ -377,9 +380,9 @@ public class SettingsActivity extends Activity{
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		Log.i(this.getClass().getSimpleName(), keyCode+"");
-		if(keyCode == 82){ //menu key
-			startActivity(new Intent(getParent(), Preferences.class));
-		}
+        if ((keyCode == KeyEvent.KEYCODE_BACK)) {
+        	finish();
+        }
 		return super.onKeyDown(keyCode, event);
 	}
 }

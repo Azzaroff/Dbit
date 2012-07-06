@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import android.app.ActivityGroup;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 public class BrowseTabGroup3Activity extends ActivityGroup{
@@ -24,4 +25,5 @@ public class BrowseTabGroup3Activity extends ActivityGroup{
         
         setContentView(view);
     }
+	
 }

@@ -421,9 +421,9 @@ public class CreateActivity extends Activity{
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		Log.i(this.getClass().getSimpleName(), keyCode+"");
-		if(keyCode == 82){ //menu key
-			startActivity(new Intent(getParent(), Preferences.class));
-		}
+		if ((keyCode == KeyEvent.KEYCODE_BACK)) {
+        	finish();
+        }
 		return super.onKeyDown(keyCode, event);
 	}
 }

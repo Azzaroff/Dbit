@@ -128,7 +128,7 @@ public class CreateUserActivity extends Activity{
 	}
 	
 	private void setPicture(Bitmap thumbnail){
-		photoView.setImageBitmap(thumbnail.createScaledBitmap(thumbnail, getWindowManager().getDefaultDisplay().getWidth()/2, getWindowManager().getDefaultDisplay().getWidth()/8*3, true));
+		photoView.setImageBitmap(thumbnail.createScaledBitmap(thumbnail, getWindowManager().getDefaultDisplay().getWidth()/8*3, getWindowManager().getDefaultDisplay().getWidth()/2, true));
 	}
 	
 	private void writePictureToStorage(Bitmap picture){

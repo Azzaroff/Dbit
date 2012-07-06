@@ -40,5 +40,5 @@ public class MainTabGroup2Activity extends ActivityGroup{
 		//Route the data to the subactivity
 		((CreateActivity)(getLocalActivityManager().getCurrentActivity())).onActivityResult(requestCode, resultCode, data);
 	}
-	  
+	 
 }

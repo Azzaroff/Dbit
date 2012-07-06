@@ -58,7 +58,7 @@ public class BrowseActivity extends Activity{
 	 @Override
 	    public boolean onKeyDown(int keyCode, KeyEvent event) {
 	        if ((keyCode == KeyEvent.KEYCODE_BACK)) {
-	        	MainTabGroup1Activity.group.back();
+	        	finish();
 	        }
 	        return true;
 	    }
@@ -80,8 +80,8 @@ public class BrowseActivity extends Activity{
  	@Override
  	protected void onResume() {
  		// TODO Auto-generated method stub
- 		mlam.dispatchResume(); 
  		super.onResume();
+ 		mlam.dispatchResume(); 
  	}
  	
  	@Override

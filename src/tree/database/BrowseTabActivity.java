@@ -506,26 +506,17 @@ public class BrowseTabActivity extends Activity{
 		super.onResume();
 		Bundle extras = getIntent().getExtras();
 		Log.i(this.getClass().getSimpleName(), "onResume");
-		gallery.setAdapter(new ImageAdapter(this, Integer.parseInt(extras.getString("Tab")), displaymetrics));
+		gallery.setAdapter(new ImageAdapter(getParent(), Integer.parseInt(extras.getString("Tab")), displaymetrics));
 //    	fill comment list
+		Log.i(this.getClass().getSimpleName(), "onResume");
 	    if(treelist.size() > 0){
-	    	laList = new LazyBrowseAdapter(this, dbhandle.getCommentList(treelist.get(selectedtree).ID), user);
+	    	laList = new LazyBrowseAdapter(getParent(), dbhandle.getCommentList(treelist.get(selectedtree).ID), user);
 	    }else{
-	    	laList = new LazyBrowseAdapter(this, new ArrayList<Comment>(), user);
+	    	laList = new LazyBrowseAdapter(getParent(), new ArrayList<Comment>(), user);
 	    }
 	    
 	//     Assign adapter to ListView
 	    commentList.setAdapter(laList);
 	    searchBar = (EditText)findViewById(R.id.browse_search);
-	}
-	
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		Log.i(this.getClass().getSimpleName(), keyCode+"");
-		if(keyCode == 82){ //menu key
-			startActivity(new Intent(getParent(), Preferences.class));
-		}
-		return super.onKeyDown(keyCode, event);
-	}
-	
+	}	
 }

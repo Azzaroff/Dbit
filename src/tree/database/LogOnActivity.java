@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -98,5 +99,19 @@ public class LogOnActivity extends Activity{
 		});
 	}
 	
+	@Override  
+	public void onBackPressed() {  
+		super.onBackPressed();
+        this.finish();  
+	}
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		Log.i(this.getClass().getSimpleName(), keyCode+"");
+		if(keyCode == 82){ //menu key
+			startActivity(new Intent(this, Preferences.class));
+		}
+		return super.onKeyDown(keyCode, event);
+	}
 	
 }

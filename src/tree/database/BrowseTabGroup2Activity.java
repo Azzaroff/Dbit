@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import android.app.ActivityGroup;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 //public class TabGroup2Activity extends TabGroupActivity {
@@ -30,5 +31,5 @@ public class BrowseTabGroup2Activity extends ActivityGroup{
         View view = getLocalActivityManager().startActivity("Recent", intent).getDecorView();
         
         setContentView(view);
-    }	
+    }
 }

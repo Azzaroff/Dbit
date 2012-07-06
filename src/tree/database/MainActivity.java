@@ -54,7 +54,7 @@ public class MainActivity extends TabActivity{
 	    setupTab(new TextView(this), (String)getText(R.string.createTabText), new Intent(this, MainTabGroup2Activity.class), extras);
 	    setupTab(new TextView(this), (String)getText(R.string.settingsTabText), new Intent(this, MainTabGroup3Activity.class), extras);
 
-	    tabHost.setCurrentTab(0);
+//	    tabHost.setCurrentTab(0);
 	}
 	
 	public void switchTab(int tabid){
@@ -66,7 +66,7 @@ public class MainActivity extends TabActivity{
 	 @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if ((keyCode == KeyEvent.KEYCODE_BACK)) {
-        	MainTabGroup1Activity.group.back();
+        	finish();
         }
         return true;
     }
