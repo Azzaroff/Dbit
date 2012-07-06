@@ -48,9 +48,9 @@ public class LogOnActivity extends Activity{
 			
 			public void onClick(View v) {
 				//debug
-				if(user == null) user = dbhandle.getUser("Work");
+//				if(user == null) user = dbhandle.getUser("Work");
 				//normal
-//				if(user == null) user = dbhandle.getUser(name.getText().toString());
+				if(user == null) user = dbhandle.getUser(name.getText().toString());
 				//connection error
 				if(!Connectivity.isConnected(context)){
 					Toast toast = Toast.makeText(getApplicationContext(), R.string.network_error, Toast.LENGTH_LONG);
@@ -67,9 +67,9 @@ public class LogOnActivity extends Activity{
 				}
 				//test the password
 				//debug
-				if(user.testPassword("test")){
+//				if(user.testPassword("test")){
 				//normal
-//				if(user.testPassword(pwd.getText().toString())){
+				if(user.testPassword(pwd.getText().toString())){
 					Intent intent = new Intent(LogOnActivity.this, MainActivity.class);
 					intent.putExtra("UserData", user);
 					startActivity(intent);
