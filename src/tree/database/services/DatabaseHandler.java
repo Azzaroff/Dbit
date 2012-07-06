@@ -105,6 +105,77 @@ public class DatabaseHandler{
 		return new ArrayList<Tree>();
 	}
 	
+	public ArrayList<Tree> getTreeListWithTime(float[] userlocation, float radius, User user, Activity activity, int time_since_last_usage){
+		ResultSet rs;
+		
+    	try {
+    		Log.i("postgres","Go Postgres!");
+			Class.forName("org.postgresql.Driver");
+			Connection conn = DriverManager.getConnection(URL);
+			
+			//calculate radius
+			float distance_in_minutes = (float) (radius / 1.852);
+			
+			if(userlocation[0] == 0.0f){
+				distance_in_minutes = Float.MAX_VALUE;
+			}
+			
+			PreparedStatement ps;
+			
+			ps = conn.prepareStatement("SELECT tid, long, lat, date, size, age, name FROM trees WHERE date > ? ;");
+			ps.setTimestamp(1, new java.sql.Timestamp(new Date().getTime() - time_since_last_usage * (1000 * 3600 * 24)));
+			
+			rs = ps.executeQuery();
+			
+//			select trees.tid, image_result.img FROM trees INNER JOIN (select tree_has_picture.tid, images.img from tree_has_picture inner join images on tree_has_picture.pid = images.pid) AS image_result ON trees.tid = image_result.tid;
+		
+			Log.i(this.getClass().getSimpleName(), ps.toString());
+			
+			HashMap<Integer, Tree> tempmap = new HashMap<Integer, Tree>();
+			int count = 0;
+		    while(rs.next()){
+		    	Double[] location = {rs.getDouble(3), rs.getDouble(2)};
+		    	Tree t = new Tree(rs.getInt(1), rs.getString(7), rs.getInt(6), rs.getDouble(5), location, rs.getTimestamp(4));
+		    	tempmap.put(t.ID, t);
+		    	++count;
+    		}
+		    Log.i(this.getClass().getSimpleName(), "Number of trees in DB: "+(count-1));
+			rs.close();
+			ps.close();
+			//get pictures if the rights are enought
+			if(user.Rights >= User.SHOW_PICTURES && tempmap.size() > 0){
+				Log.i(this.getClass().getSimpleName(), "get pictures from database");
+				ps = conn.prepareStatement("SELECT tree_has_picture.tid, images.img_thumb FROM tree_has_picture INNER JOIN images ON tree_has_picture.pid = images.pid;");
+				rs = ps.executeQuery();
+				Log.i(this.getClass().getSimpleName(), ps.toString());
+				Tree temptree;
+				while(rs.next()){
+					byte[] bytes = rs.getBytes(2);
+					temptree = tempmap.get(rs.getInt(1));
+					if(temptree != null) temptree.Images.add(BitmapFactory.decodeByteArray(bytes, 0, bytes.length));
+				}
+				rs.close();
+				ps.close();
+			}
+			//check, if the statement changes DB entries
+			conn.close();
+			for(Tree t : tempmap.values()){
+				if(t.Images == null || t.Images.size() == 0){
+					//there are no images to this tree
+					t.Images.add(BitmapFactory.decodeResource(activity.getResources(), R.drawable.baum));
+				}
+			}
+			return new ArrayList<Tree>(tempmap.values());
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+    	Log.i(this.getClass().getSimpleName(), user.toString());
+		
+		return new ArrayList<Tree>();
+	}
+	
 	public ArrayList<Tree> getTreeListWithRadius(float[] userlocation, float radius, User user, Activity activity, int time_since_last_usage){
 		ResultSet rs;
 		
