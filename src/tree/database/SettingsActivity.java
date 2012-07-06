@@ -9,12 +9,14 @@ import tree.database.misc.SettingsTreelistAdapter;
 import tree.database.services.DatabaseHandler;
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -328,5 +330,14 @@ public class SettingsActivity extends Activity{
 		//fill treelist
 		taList = new SettingsTreelistAdapter(this, dbhandle.getUsersTreeList(user, this));
 		myTreeListView.setAdapter(taList);	
+	}
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		Log.i(this.getClass().getSimpleName(), keyCode+"");
+		if(keyCode == 82){ //menu key
+			startActivity(new Intent(getParent(), Preferences.class));
+		}
+		return super.onKeyDown(keyCode, event);
 	}
 }

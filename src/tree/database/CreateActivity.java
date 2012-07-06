@@ -26,6 +26,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -415,5 +416,14 @@ public class CreateActivity extends Activity{
 				dialog.show();
 			}
 		};
+	}
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		Log.i(this.getClass().getSimpleName(), keyCode+"");
+		if(keyCode == 82){ //menu key
+			startActivity(new Intent(getParent(), Preferences.class));
+		}
+		return super.onKeyDown(keyCode, event);
 	}
 }
