@@ -105,7 +105,7 @@ public class DatabaseHandler{
 		return new ArrayList<Tree>();
 	}
 	
-	public ArrayList<Tree> getTreeListWithTime(float[] userlocation, float radius, User user, Activity activity, int time_since_last_usage){
+	public ArrayList<Tree> getTreeListWithTime(float[] userlocation, float radius, User user, Activity activity, int days_since_last_usage){
 		ResultSet rs;
 		
     	try {
@@ -113,17 +113,12 @@ public class DatabaseHandler{
 			Class.forName("org.postgresql.Driver");
 			Connection conn = DriverManager.getConnection(URL);
 			
-			//calculate radius
-			float distance_in_minutes = (float) (radius / 1.852);
-			
-			if(userlocation[0] == 0.0f){
-				distance_in_minutes = Float.MAX_VALUE;
-			}
-			
 			PreparedStatement ps;
+			String query = "SELECT tid, long, lat, date, size, age, name FROM trees WHERE date > (now() - interval '";
+			query += days_since_last_usage;
+			query += " days') ;";
 			
-			ps = conn.prepareStatement("SELECT tid, long, lat, date, size, age, name FROM trees WHERE date > ? ;");
-			ps.setTimestamp(1, new java.sql.Timestamp(new Date().getTime() - time_since_last_usage * (1000 * 3600 * 24)));
+			ps = conn.prepareStatement(query);
 			
 			rs = ps.executeQuery();
 			
@@ -461,7 +456,7 @@ public class DatabaseHandler{
 				//increase user rights
 				ps = conn.prepareStatement("select updateRights(?);");
 				ps.setInt(1, uid);
-				ps.executeUpdate();
+				ps.executeQuery();
 				ps.close();
 				return true;
 			}

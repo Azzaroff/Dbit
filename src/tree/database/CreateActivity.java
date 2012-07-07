@@ -187,6 +187,8 @@ public class CreateActivity extends Activity{
 								
 								Toast toast = Toast.makeText(getParent(), getText(R.string.db_success), Toast.LENGTH_LONG);
 								toast.show();
+								user = dbhandle.getUser(user.Name);
+								getIntent().putExtra("UserData", user);
 								
 								picture = null;
 								setPicture(picture);

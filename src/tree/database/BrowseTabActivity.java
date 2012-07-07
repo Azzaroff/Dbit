@@ -369,9 +369,9 @@ public class BrowseTabActivity extends Activity{
 	        	location[0] = (float)currentLocation.getLatitude();
 	        	location[1] = (float)currentLocation.getLongitude();
 	        }
-	        if(tabID == 0){
+	        if(tabID == 1){
 	        	treelist = dbhandle.getTreeListWithRadius(location, prefs.getInt("distance", 5), user, getParent(), prefs.getInt("time", 5));
-	        }else if(tabID == 1){
+	        }else if(tabID == 2){
 	        	treelist = dbhandle.getTreeListWithTime(location, prefs.getInt("distance", 5), user, getParent(), prefs.getInt("time", 5));
 	        }else{
 	        	treelist = dbhandle.getTreeList(location, Float.MAX_VALUE, user, getParent(), prefs.getInt("time", 5));
