@@ -52,7 +52,8 @@ public class LogOnActivity extends Activity{
 				//debug
 //				if(user == null) user = dbhandle.getUser("Work");
 				//normal
-				if(user == null) user = dbhandle.getUser(name.getText().toString());
+				if(user == null || 
+						!user.Name.equals(name.getText().toString())) user = dbhandle.getUser(name.getText().toString());
 				//connection error
 				if(!Connectivity.isConnected(context)){
 					Toast toast = Toast.makeText(getApplicationContext(), R.string.network_error, Toast.LENGTH_LONG);
