@@ -4,7 +4,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 
 import tree.database.data.Comment;
 import tree.database.data.Tree;
@@ -16,14 +15,12 @@ import tree.database.services.DatabaseHandler;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.Editable;
@@ -34,8 +31,8 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
-import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -69,20 +66,16 @@ public class BrowseTabActivity extends Activity{
 	private DatabaseHandler dbhandle;
 	
 	private int selectedtree = 0;
-	private int selectedImage = 0;
 	private ArrayList<Tree> treelist = new ArrayList<Tree>();
 	private ArrayList<Tree> oldtreelist = new ArrayList<Tree>();
 	
 	/*list adapter for listview*/
 	LazyBrowseAdapter laList = null;
-	private ArrayList<HashMap<String, String>> myListing = new ArrayList<HashMap<String, String>>();
 	
 	//user
 	User user;
 	
 	//GPS Location Manager
-	private LocationManager locationManager;
-	private GeoUpdateHandler updatehandler = new GeoUpdateHandler(); //handles gps updates
 	private Location currentLocation;
 	
 	//image display dialog
@@ -152,7 +145,6 @@ public class BrowseTabActivity extends Activity{
 	            Toast.makeText(BrowseTabActivity.this, "" + position, Toast.LENGTH_SHORT).show();
 	            
 	            selectedtree = getSelectedTree(position);
-	            selectedImage = getSelectedImage(position);
 	            
 	           showTreeInfo(selectedtree);
 	           laList = new LazyBrowseAdapter(getParent(), dbhandle.getCommentList(treelist.get(selectedtree).ID), user);
@@ -160,26 +152,26 @@ public class BrowseTabActivity extends Activity{
 	        }
 	    });
 	    
-	    gallery.setOnLongClickListener(new OnLongClickListener() {
-			
-			public boolean onLongClick(View v) {
-				//debug
-				Log.i(this.getClass().getSimpleName(), "long click");
-				//prepare dialog
-				image_dialog.setTitle(treelist.get(selectedtree).Name);
-				//get the right picture to show
-				Bitmap high_res_image = dbhandle.getHighResPicture(treelist.get(selectedtree).ID, getSelectedTree(gallery.getSelectedItemPosition()), Connectivity.getConnectionSpeed(getParent()));
-				if(high_res_image != null){
-					image_dialog_image.setImageBitmap(high_res_image);
-				}else{
-					image_dialog_image.setImageBitmap(treelist.get(selectedtree).Images.get(getSelectedTree(gallery.getSelectedItemPosition())));
-				}
-				//show dialog
-				image_dialog.show();
-				
-				return false;
-			}
-		});
+//	    gallery.setOnLongClickListener(new OnLongClickListener() {
+//			
+//			public boolean onLongClick(View v) {
+//				//debug
+//				Log.i(this.getClass().getSimpleName(), "long click");
+//				//prepare dialog
+//				image_dialog.setTitle(treelist.get(selectedtree).Name);
+//				//get the right picture to show
+//				Bitmap high_res_image = dbhandle.getHighResPicture(treelist.get(selectedtree).ID, getSelectedTree(gallery.getSelectedItemPosition()), Connectivity.getConnectionSpeed(getParent()));
+//				if(high_res_image != null){
+//					image_dialog_image.setImageBitmap(high_res_image);
+//				}else{
+//					image_dialog_image.setImageBitmap(treelist.get(selectedtree).Images.get(getSelectedTree(gallery.getSelectedItemPosition())));
+//				}
+//				//show dialog
+//				image_dialog.show();
+//				
+//				return false;
+//			}
+//		});
 	    
 	    gallery.setOnItemLongClickListener(new OnItemLongClickListener() {
 
@@ -187,12 +179,19 @@ public class BrowseTabActivity extends Activity{
 					int arg2, long arg3) {
 				
 				selectedtree = getSelectedTree(arg2);
-				selectedImage = getSelectedImage(arg2);
 				//debug
-				Log.i(this.getClass().getSimpleName(), "long click");
+				Log.i(this.getClass().getSimpleName(), "long click 2");
+				Bitmap high_res_image = dbhandle.getHighResPicture(treelist.get(selectedtree).ID, getSelectedImage(arg2), Connectivity.getConnectionSpeed(getParent()));
+				if(high_res_image != null){
+					image_dialog_image.setImageBitmap(Bitmap.createScaledBitmap(high_res_image, (int)(displaymetrics.widthPixels*0.9f), (int)(displaymetrics.widthPixels*0.9)/3*4, true));
+				}else{
+					image_dialog_image.setImageBitmap(Bitmap.createScaledBitmap(treelist.get(selectedtree).Images.get(getSelectedImage(arg2)), 
+							(int)(displaymetrics.widthPixels*0.9f), (int)(displaymetrics.widthPixels*0.9)/3*4, true));
+				}
+				image_dialog_image.setScaleType(ImageView.ScaleType.FIT_XY);
 				onPrepareDialog(SHOW_PICTURE_DIALOG, image_dialog);
 				//show dialog
-				showDialog(SHOW_PICTURE_DIALOG);
+				image_dialog.show();
 				return false;
 			}
 		});
@@ -271,6 +270,15 @@ public class BrowseTabActivity extends Activity{
 				
 			}
 		});
+	    
+		//close the keyboard
+		getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+		InputMethodManager imm = (InputMethodManager)getSystemService(
+	    	    Context.INPUT_METHOD_SERVICE);
+    	imm.hideSoftInputFromWindow(searchBar.getWindowToken(), 0);
+    	searchBar.clearFocus();
+    	gallery.requestFocus();
+	    
 	}
 	
 	private void showTreeInfo(int selectedTree){
@@ -307,6 +315,7 @@ public class BrowseTabActivity extends Activity{
 		    dialog.setContentView(R.layout.picture_dialog);
 		    dialog.setCancelable(true);
 		    Button dialog_button = (Button) dialog.findViewById(R.id.picture_dialog_button);
+		    image_dialog_image = (ImageView) dialog.findViewById(R.id.picture_dialog_image);
 		    
 		    dialog_button.setOnClickListener(new OnClickListener() {
 				public void onClick(View v) {
@@ -325,9 +334,9 @@ public class BrowseTabActivity extends Activity{
 		switch(id){
 			case SHOW_PICTURE_DIALOG:{
 				dialog.setTitle(treelist.get(selectedtree).Name);
-				ImageView dialog_image = (ImageView) dialog.findViewById(R.id.picture_dialog_image);
-				dialog_image.setImageBitmap(Bitmap.createScaledBitmap(treelist.get(selectedtree).Images.get(selectedImage), (int)(displaymetrics.widthPixels*0.9f), (int)(displaymetrics.widthPixels*0.9)/3*4, true));
-				dialog_image.setScaleType(ImageView.ScaleType.FIT_XY);
+				//get the right picture to show
+				//show dialog
+//				image_dialog.show();
 				break;
 			}
 		}
@@ -345,7 +354,6 @@ public class BrowseTabActivity extends Activity{
 	    private Context mContext;
 	    private int displaywidth = 0;
 	    
-//	    private File[] imageList;
 	    private ArrayList<Bitmap> imageList;
 
 	    public ImageAdapter(Context c, int tabID, DisplayMetrics displaymetrics) {
@@ -483,21 +491,21 @@ public class BrowseTabActivity extends Activity{
 				selectedItem -= t.Images.size();
 				selectedTree++;
 			}else{
-				return selectedTree;
+				break;
 			}
 		}
-		return -1;
+		return selectedTree;
 	}
 	
 	protected int getSelectedImage(int selectedItem){
 		for(Tree t : treelist){
-			if(t.Images.size() <= selectedItem){
+			if((t.Images.size()) <= selectedItem){
 				selectedItem -= t.Images.size();
 			}else{
 				return selectedItem;
 			}
 		}
-		return -1;
+		return selectedItem;
 	}
 	
 	@Override
@@ -517,6 +525,14 @@ public class BrowseTabActivity extends Activity{
 	    
 	//     Assign adapter to ListView
 	    commentList.setAdapter(laList);
-	    searchBar = (EditText)findViewById(R.id.browse_search);
+	    
+	  //close the keyboard
+	  getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+	  searchBar.clearFocus();
+	  InputMethodManager imm = (InputMethodManager)getSystemService(
+    	      Context.INPUT_METHOD_SERVICE);
+    	imm.hideSoftInputFromWindow(searchBar.getWindowToken(), 0);
+    	searchBar.clearFocus();
+    	gallery.requestFocus();
 	}	
 }

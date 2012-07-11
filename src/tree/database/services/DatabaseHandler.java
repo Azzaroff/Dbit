@@ -27,7 +27,7 @@ import android.util.Log;
 
 public class DatabaseHandler{
 
-	private Connection connection;
+//	private Connection connection;
 	private static String URL = "jdbc:postgresql://seclab10.medien.uni-weimar.de/baumdb?user=worker&password=mindless&ssl=true&sslfactory=org.postgresql.ssl.NonValidatingFactory";
 	
 	public ArrayList<Tree> getTreeList(float[] userlocation, float radius, User user, Activity activity, int time_since_last_usage){
@@ -473,8 +473,10 @@ public class DatabaseHandler{
 	
 	public Bitmap getHighResPicture(int tid, int picture_number, int connectionspeed) {
 		// TODO Auto-generated method stub
+		Log.d(this.getClass().getSimpleName(), "Connection Speed: "+connectionspeed);
+		Bitmap picture = null;
 		if(connectionspeed == Connectivity.NETWORK_CONNECTION_SPEED_UNKNOWN || connectionspeed == Connectivity.NETWORK_CONNECTION_SPEED_VERY_LOW){
-			return null;
+			return picture;
 		}else{
 			try {
 	    		Log.i("postgres","Go Postgres!");
@@ -483,30 +485,30 @@ public class DatabaseHandler{
 				
 				PreparedStatement ps;
 				ResultSet rs;
-				Bitmap picture = null;
+				
 				String[] column = {"img_240", "img_480", "img_960"};
 				
-				ps = conn.prepareStatement("SELECT ? images WHERE pid = ?;");
-				ps.setString(1, column[connectionspeed-1]);
-				ps.setInt(2, tid);
+				ps = conn.prepareStatement("SELECT "+column[connectionspeed-1]+" FROM tree_has_picture NATURAL JOIN images WHERE tid = ?;");
+				ps.setInt(1, tid);
+				Log.i(this.getClass().getSimpleName(), ps.toString());
 				
 				rs = ps.executeQuery();
 				while(rs.next()){
-					picture_number --;
 					if(picture_number == 0) break;
+					picture_number --;
 				}
-				byte[] bytes = rs.getBytes(0);
+				byte[] bytes = rs.getBytes(1);
+				Log.d(this.getClass().getSimpleName(), "Length: "+bytes.length);
 			    picture = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
 				ps.close();
 				rs.close();
-				return picture;
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		}
-		return null;
+		return picture;
 	}
 	
 	public ArrayList<Group> getGroupList(int userID){

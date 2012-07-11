@@ -39,7 +39,7 @@
         <activity android:label="browsegroup2" android:name=".BrowseTabGroup2Activity"> </activity>
         <activity android:label="browsegroup3" android:name=".BrowseTabGroup3Activity"> </activity>
         
-        <activity android:label="nearbrowse" android:name=".BrowseTabActivity"> </activity>
+        <activity android:label="nearbrowse" android:name=".BrowseTabActivity" android:windowSoftInputMode="stateHidden"></activity>      
         <activity android:label="recentbrowse" android:name=".RecentTabActivity"> </activity>
         <activity android:label="allbrowse" android:name=".AllTabActivity"> </activity>
         
